@@ -25,6 +25,10 @@
         <activity
             android:name=".NoteBookActivity"
             android:label="@string/title_activity_note_book"
+            android:theme="@style/AppTheme.NoActionBar" />
+        <activity
+            android:name=".PageActivity"
+            android:label="@string/title_activity_page"
             android:theme="@style/AppTheme.NoActionBar"></activity>
     </application>
 
