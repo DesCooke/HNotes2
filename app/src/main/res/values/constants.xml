@@ -1,0 +1,4 @@
+<resources>
+    <string name="database_filename">/storage/emulated/0/hnotes/hnotes.db</string>
+    <string name="home_directory">/storage/emulated/0/hnotes</string>
+</resources>
