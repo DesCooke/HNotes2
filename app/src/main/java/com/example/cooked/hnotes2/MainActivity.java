@@ -2,6 +2,7 @@ package com.example.cooked.hnotes2;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.provider.ContactsContract;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.NavigationView;
 import android.support.v4.view.GravityCompat;
@@ -18,6 +19,7 @@ import android.view.View;
 
 import com.example.cooked.hnotes2.Database.Database;
 import com.example.cooked.hnotes2.Database.RecordNoteBook;
+import com.example.cooked.hnotes2.Database.RecordPage;
 import com.example.cooked.hnotes2.UI.NoteBookAdapter;
 import com.example.cooked.hnotes2.Utils.MyPermission;
 
@@ -101,19 +103,31 @@ public class MainActivity extends AppCompatActivity
         mNoteBookAdapter = new NoteBookAdapter(mDataset);
         mNoteBookList.setAdapter(mNoteBookAdapter);
 
-/*
+
         mNoteBookAdapter.setOnItemClickListener(new NoteBookAdapter.OnItemClickListener()
         {
             @Override
             public void onItemClick(View view, RecordNoteBook obj)
             {
+                String lAction="view";
+                RecordNoteBook rec=Database.MyDatabase().getNoteBook(obj.getId());
+                if(rec.PageCount==0)
+                {
+                    RecordPage recp = new RecordPage();
+                    recp.setNoteBookId(obj.getId());
+                    recp.setId(Database.MyDatabase().getNextPageId());
+                    recp.setPageNo(Database.MyDatabase().getNextPageNo(obj.getId()));
+                    recp.setContent("Page " + recp.getPageNo());
+                    Database.MyDatabase().addPage(recp);
+                    lAction="edit";
+                }
                 Intent intent = new Intent(getApplicationContext(), PageActivity.class);
-                intent.putExtra("ACTION", "modify");
+                intent.putExtra("ACTION", lAction);
                 intent.putExtra("NOTEBOOKID", obj.getId());
                 startActivity(intent);
             }
         });
-*/
+
     }
 
     @Override

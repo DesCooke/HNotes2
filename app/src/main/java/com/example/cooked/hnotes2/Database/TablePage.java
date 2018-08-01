@@ -44,7 +44,7 @@ public class TablePage extends TableBase
 
         String lSql =
                 "INSERT INTO Page " +
-                        "(Id, NoteBookId, PageId, Content) " +
+                        "(Id, NoteBookId, PageNo, Content) " +
                         "VALUES " +
                         "( " + recordPage.getId() + ", " +
                         "  " + recordPage.getNoteBookId() + ", " +
@@ -126,6 +126,23 @@ public class TablePage extends TableBase
         return(1);
     }
 
+    public int getPageCount(SQLiteOpenHelper helper, int noteBookId)
+    {
+        SQLiteDatabase db = helper.getReadableDatabase();
+        String lSql = "select IFNULL(COUNT(*),0) FROM Page WHERE noteBookId = " + noteBookId;
+        Cursor cursor = db.rawQuery(lSql, null);
+
+        if (cursor != null)
+        {
+            if (cursor.getCount()>0) {
+                cursor.moveToFirst();
+                return (Integer.parseInt(cursor.getString(0)));
+            }
+        }
+
+        return(0);
+    }
+
     public RecordPage[] getList(SQLiteOpenHelper helper, int noteBookId)
     {
         SQLiteDatabase db = helper.getReadableDatabase();
@@ -133,7 +150,7 @@ public class TablePage extends TableBase
         String lSql =
                 "select Id, NoteBookId, PageNo, Content " +
                         "FROM Page " +
-                        "ORDER BY PageId ";
+                        "ORDER BY PageNo ";
         Cursor cursor = db.rawQuery(lSql, null);
 
         RecordPage[] list;

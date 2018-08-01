@@ -27,9 +27,9 @@ public class RecordPage {
         this.noteBookId = noteBookId;
     }
 
-    public void setPageId(int pageId)
+    public void setPageNo(int pageNo)
     {
-        this.pageNo = pageId;
+        this.pageNo = pageNo;
     }
 
     public void setId(int id)

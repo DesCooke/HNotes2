@@ -76,7 +76,9 @@ public class Database extends SQLiteOpenHelper
 
     public RecordNoteBook getNoteBook(int id)
     {
-        return tableNoteBook.getItem(this, id);
+        RecordNoteBook rec=tableNoteBook.getItem(this, id);
+        rec.PageCount = tablePage.getPageCount(this, id);
+        return(rec);
     }
 
     public int getNextNoteBookId()
