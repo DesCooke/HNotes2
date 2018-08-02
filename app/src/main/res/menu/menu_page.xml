@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <item
+        android:id="@+id/mnuAddPageBefore"
+        android:title="Add Page Before" />
+    <item
+        android:id="@+id/mnuAddPageAfter"
+        android:title="Add Page After" />
+    <item
+        android:id="@+id/mnuDeletePage"
+        android:title="Delete Page" />
+    <item
+        android:id="@+id/mnuAddPageToEnd"
+        android:title="Add Page to End" />
+</menu>

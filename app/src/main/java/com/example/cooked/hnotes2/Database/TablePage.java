@@ -148,8 +148,9 @@ public class TablePage extends TableBase
         SQLiteDatabase db = helper.getReadableDatabase();
 
         String lSql =
-                "select Id, NoteBookId, PageNo, Content " +
+                "select NoteBookId, PageNo, Id, Content " +
                         "FROM Page " +
+                        "WHERE NoteBookId = " + noteBookId + " " +
                         "ORDER BY PageNo ";
         Cursor cursor = db.rawQuery(lSql, null);
 
@@ -185,7 +186,7 @@ public class TablePage extends TableBase
         String lSql =
                 "UPDATE Page " +
                         "SET Content = '" + recordPage.getContent() + "', " +
-                        " PageId = " + recordPage.getPageNo() + " " +
+                        " PageNo = " + recordPage.getPageNo() + " " +
                         "WHERE Id = " + recordPage.getId();
 
         db.execSQL(lSql);

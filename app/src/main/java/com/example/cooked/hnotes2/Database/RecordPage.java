@@ -14,10 +14,10 @@ public class RecordPage {
         content = "";
     }
 
-    public RecordPage(int noteBookId, int pageId, int id, String content)
+    public RecordPage(int noteBookId, int pageNo, int id, String content)
     {
         this.noteBookId = noteBookId;
-        this.pageNo = pageId;
+        this.pageNo = pageNo;
         this.id = id;
         this.content = content;
     }
