@@ -1,5 +1,6 @@
 package com.example.cooked.hnotes2;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
@@ -12,6 +13,7 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.EditText;
+import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -22,6 +24,9 @@ import com.example.cooked.hnotes2.UI.PageAdapter;
 
 public class PageActivity extends AppCompatActivity {
 
+    public static boolean editMode;
+    public static int currPageIndex;
+    public static int lastPageIndex;
     public int noteBookId;
     public String action;
     public RecordNoteBook recordNoteBook;
@@ -30,11 +35,14 @@ public class PageActivity extends AppCompatActivity {
     public int currentPage;
     public int lastPage;
     public ViewPager viewPager;
+    public ImageView iconEdit;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         currentPage=0;
+        currPageIndex=0;
+        lastPageIndex=0;
         lastPage=-1;
         setContentView(R.layout.activity_page);
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
@@ -57,6 +65,32 @@ public class PageActivity extends AppCompatActivity {
         savePage();
     }
 
+    public View getCurrentView()
+    {
+        for(int i=0;i<2;i++)
+        {
+            View myView = viewPager.getChildAt(i);
+            TextView txtPageIndex = myView.findViewById(R.id.txtPageIndex);
+            int pageIndex = Integer.parseInt(txtPageIndex.getText().toString());
+            if(pageIndex==currPageIndex)
+                return(myView);
+        }
+        return(null);
+    }
+
+    public View getPreviousView()
+    {
+        for(int i=0;i<2;i++)
+        {
+            View myView = viewPager.getChildAt(i);
+            TextView txtPageIndex = myView.findViewById(R.id.txtPageIndex);
+            int pageIndex = Integer.parseInt(txtPageIndex.getText().toString());
+            if(pageIndex==lastPageIndex)
+                return(myView);
+        }
+        return(null);
+    }
+
     public void refreshBook()
     {
         int lPage;
@@ -64,6 +98,28 @@ public class PageActivity extends AppCompatActivity {
         recordPageList = Database.MyDatabase().getPageList(noteBookId);
         setTitle(recordNoteBook.getName() + ", 1 of " + recordNoteBook.PageCount);
         viewPager = (ViewPager) findViewById(R.id.viewpager);
+        iconEdit = (ImageView) findViewById(R.id.iconEdit);
+        iconEdit.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if(PageActivity.editMode)
+                {
+                    View lview = getCurrentView();
+                    if(lview!=null) {
+                        EditText edtPageText = lview.findViewById(R.id.edtPageText);
+                        TextView txtPageIndex = lview.findViewById(R.id.txtPageIndex);
+                        TextView txtPageText = lview.findViewById(R.id.txtPageText);
+                        int pageIndex = Integer.parseInt(txtPageIndex.getText().toString());
+                        String lText = edtPageText.getText().toString();
+                        recordPageList[pageIndex].setContent(lText);
+                        Database.MyDatabase().updatePage(recordPageList[pageIndex]);
+                        txtPageText.setText(lText);
+                    }
+                }
+                PageActivity.editMode = !PageActivity.editMode;
+                refreshBook();
+            }
+        });
         lPage = viewPager.getCurrentItem();
         viewPager.setAdapter(new PageAdapter(this, noteBookId, recordPageList));
         viewPager.setCurrentItem(lPage);
@@ -76,17 +132,21 @@ public class PageActivity extends AppCompatActivity {
             @Override
             public void onPageSelected(int position)
             {
+                PageActivity.lastPageIndex = PageActivity.currPageIndex;
                 lastPage=currentPage;
+                PageActivity.currPageIndex = position;
 
                 setTitle(recordNoteBook.getName() + ", " + (position+1) + " of " + recordNoteBook.PageCount);
 
-                View lview = viewPager.getChildAt(lastPage);
+                View lview = getPreviousView();
                 if(lview!=null)
                 {
                     EditText edtPageText = lview.findViewById(R.id.edtPageText);
                     TextView txtPageIndex = lview.findViewById(R.id.txtPageIndex);
+                    TextView txtPageText = lview.findViewById(R.id.txtPageText);
                     int pageIndex = Integer.parseInt(txtPageIndex.getText().toString());
                     recordPageList[pageIndex].setContent(edtPageText.getText().toString());
+                    txtPageText.setText(edtPageText.getText().toString());
                     Database.MyDatabase().updatePage(recordPageList[pageIndex]);
                 }
 
@@ -120,6 +180,15 @@ public class PageActivity extends AppCompatActivity {
     }
 
     @Override
+    protected void onResume()
+    {
+        super.onResume();
+
+        refreshBook();
+    }
+
+
+    @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         MenuInflater inflater = getMenuInflater();
         inflater.inflate(R.menu.menu_page, menu);
@@ -144,6 +213,19 @@ public class PageActivity extends AppCompatActivity {
             case R.id.mnuAddPageBefore:
                 break;
             case R.id.mnuDeletePage:
+                Database.MyDatabase().deletePage(recordPageList[PageActivity.currPageIndex]);
+                refreshBook();
+
+                break;
+            case R.id.mnuEditBook:
+                Intent intent = new Intent(getApplicationContext(), NoteBookActivity.class);
+                intent.putExtra("ACTION", "modify");
+                intent.putExtra("NOTEBOOKID", noteBookId);
+                startActivity(intent);
+                break;
+            case R.id.mnuDeleteBook:
+                Database.MyDatabase().deleteNoteBook(recordNoteBook);
+                finish();
                 break;
             default:
                 break;

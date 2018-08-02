@@ -111,6 +111,7 @@ public class MainActivity extends AppCompatActivity
             {
                 String lAction="view";
                 RecordNoteBook rec=Database.MyDatabase().getNoteBook(obj.getId());
+                PageActivity.editMode = false;
                 if(rec.PageCount==0)
                 {
                     RecordPage recp = new RecordPage();
@@ -120,6 +121,7 @@ public class MainActivity extends AppCompatActivity
                     recp.setContent("<empty>");
                     Database.MyDatabase().addPage(recp);
                     lAction="edit";
+                    PageActivity.editMode = true;
                 }
                 Intent intent = new Intent(getApplicationContext(), PageActivity.class);
                 intent.putExtra("ACTION", lAction);

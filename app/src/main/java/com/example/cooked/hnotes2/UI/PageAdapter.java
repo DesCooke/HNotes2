@@ -12,6 +12,7 @@ import android.widget.TextView;
 
 import com.example.cooked.hnotes2.Database.Database;
 import com.example.cooked.hnotes2.Database.RecordPage;
+import com.example.cooked.hnotes2.PageActivity;
 import com.example.cooked.hnotes2.R;
 
 public class PageAdapter extends PagerAdapter {
@@ -21,6 +22,7 @@ public class PageAdapter extends PagerAdapter {
     public TextView txtPageIndex;
     public RecordPage recordPageList[];
     public EditText edtPageText;
+    public TextView txtPageText;
 
     public PageAdapter(Context context, int noteBookId, RecordPage[] recArray) {
         mContext = context;
@@ -35,8 +37,20 @@ public class PageAdapter extends PagerAdapter {
         ViewGroup layout = (ViewGroup) inflater.inflate(R.layout.cell_page, collection, false);
         edtPageText = layout.findViewById(R.id.edtPageText);
         edtPageText.setText(recordPageList[position].getContent());
+        txtPageText = layout.findViewById(R.id.txtPageText);
+        txtPageText.setText(recordPageList[position].getContent());
         txtPageIndex = layout.findViewById(R.id.txtPageIndex);
         txtPageIndex.setText(String.valueOf(position));
+        if(PageActivity.editMode)
+        {
+            txtPageText.setVisibility(View.INVISIBLE);
+            edtPageText.setVisibility(View.VISIBLE);
+        }
+        else
+        {
+            txtPageText.setVisibility(View.VISIBLE);
+            edtPageText.setVisibility(View.INVISIBLE);
+        }
         collection.addView(layout);
         return layout;
     }

@@ -13,4 +13,10 @@
     <item
         android:id="@+id/mnuAddPageToEnd"
         android:title="Add Page to End" />
+    <item
+        android:id="@+id/mnuEditBook"
+        android:title="Edit Book" />
+    <item
+        android:id="@+id/mnuDeleteBook"
+        android:title="DeleteBook" />
 </menu>

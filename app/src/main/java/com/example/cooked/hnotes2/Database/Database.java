@@ -98,6 +98,7 @@ public class Database extends SQLiteOpenHelper
 
     public void deleteNoteBook(RecordNoteBook recordNoteBook)
     {
+        tablePage.deleteAll(this, recordNoteBook.getId());
         tableNoteBook.deleteItem(this, recordNoteBook);
     }
 
