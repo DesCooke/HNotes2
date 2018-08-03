@@ -1,11 +1,13 @@
 package com.example.cooked.hnotes2;
 
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
 import android.support.v4.view.PagerAdapter;
 import android.support.v4.view.ViewPager;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.Menu;
@@ -96,6 +98,19 @@ public class PageActivity extends AppCompatActivity {
     {
         int lPage;
         recordNoteBook = Database.MyDatabase().getNoteBook(noteBookId);
+
+        if(recordNoteBook.PageCount==0)
+        {
+            RecordPage recp = new RecordPage();
+            recp.setNoteBookId(noteBookId);
+            recp.setId(Database.MyDatabase().getNextPageId());
+            recp.setPageNo(Database.MyDatabase().getNextPageNo(noteBookId));
+            recp.setContent("");
+            Database.MyDatabase().addPage(recp);
+            PageActivity.editMode = true;
+            recordNoteBook = Database.MyDatabase().getNoteBook(noteBookId);
+        }
+
         recordPageList = Database.MyDatabase().getPageList(noteBookId);
         setTitle(recordNoteBook.getName() + ", 1 of " + recordNoteBook.PageCount);
         viewPager = (ViewPager) findViewById(R.id.viewpager);
@@ -265,8 +280,27 @@ public class PageActivity extends AppCompatActivity {
                 refreshBook();
                 break;
             case R.id.mnuDeletePage:
-                Database.MyDatabase().deletePage(recordPageList[PageActivity.currPageIndex]);
-                refreshBook();
+                DialogInterface.OnClickListener dialogClickListener =
+                        new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        switch (which){
+                            case DialogInterface.BUTTON_POSITIVE:
+                                Database.MyDatabase().deletePage(recordPageList[PageActivity.currPageIndex]);
+                                refreshBook();
+                                break;
+
+                            case DialogInterface.BUTTON_NEGATIVE:
+                                //No button clicked
+                                break;
+                        }
+                    }
+                };
+
+                AlertDialog.Builder builder = new AlertDialog.Builder(this);
+                builder.setMessage("Really delete this page?").setPositiveButton("Yes", dialogClickListener)
+                        .setNegativeButton("No", dialogClickListener).show();
+
 
                 break;
             case R.id.mnuEditBook:
@@ -276,8 +310,27 @@ public class PageActivity extends AppCompatActivity {
                 startActivity(intent);
                 break;
             case R.id.mnuDeleteBook:
-                Database.MyDatabase().deleteNoteBook(recordNoteBook);
-                finish();
+                DialogInterface.OnClickListener dialogClickListener2 =
+                        new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialog, int which) {
+                                switch (which){
+                                    case DialogInterface.BUTTON_POSITIVE:
+                                        Database.MyDatabase().deleteNoteBook(recordNoteBook);
+                                        finish();
+                                        break;
+
+                                    case DialogInterface.BUTTON_NEGATIVE:
+                                        //No button clicked
+                                        break;
+                                }
+                            }
+                        };
+
+                AlertDialog.Builder builder2 = new AlertDialog.Builder(this);
+                builder2.setMessage("Really delete this book?").setPositiveButton("Yes", dialogClickListener2)
+                        .setNegativeButton("No", dialogClickListener2).show();
+
                 break;
             default:
                 break;

@@ -118,7 +118,7 @@ public class MainActivity extends AppCompatActivity
                     recp.setNoteBookId(obj.getId());
                     recp.setId(Database.MyDatabase().getNextPageId());
                     recp.setPageNo(Database.MyDatabase().getNextPageNo(obj.getId()));
-                    recp.setContent("<empty>");
+                    recp.setContent("");
                     Database.MyDatabase().addPage(recp);
                     lAction="edit";
                     PageActivity.editMode = true;

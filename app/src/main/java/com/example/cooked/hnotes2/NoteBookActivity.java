@@ -12,6 +12,9 @@ import android.widget.ImageView;
 import com.example.cooked.hnotes2.Database.Database;
 import com.example.cooked.hnotes2.Database.RecordNoteBook;
 import com.example.cooked.hnotes2.Utils.InternalImageList;
+import com.example.cooked.hnotes2.Utils.MyBitmap;
+
+import static com.example.cooked.hnotes2.Utils.ImageUtils.imageUtils;
 
 public class NoteBookActivity extends AppCompatActivity  implements View.OnClickListener
 {
@@ -25,6 +28,7 @@ public class NoteBookActivity extends AppCompatActivity  implements View.OnClick
     public RecordNoteBook rec;
     public final int SELECT_DEVICE_PHOTO=1;
     public final int SELECT_INTERNAL_PHOTO=2;
+    public String internalImageFilename;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -34,6 +38,7 @@ public class NoteBookActivity extends AppCompatActivity  implements View.OnClick
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
+        internalImageFilename="";
         imageBook = findViewById(R.id.imageBook);
         edtName = findViewById(R.id.edtName);
         edtShortDescription = findViewById(R.id.edtShortDescription);
@@ -56,6 +61,7 @@ public class NoteBookActivity extends AppCompatActivity  implements View.OnClick
 
                 edtName.getEditText().setText("");
                 edtShortDescription.getEditText().setText("");
+                rec = new RecordNoteBook();
             }
 
             if (action.compareTo("modify") == 0) {
@@ -67,6 +73,17 @@ public class NoteBookActivity extends AppCompatActivity  implements View.OnClick
 
                 edtName.getEditText().setText(rec.getName());
                 edtShortDescription.getEditText().setText(rec.getShortDescription());
+
+                if(rec.cover.length() > 0) {
+                    MyBitmap myBitmap = new MyBitmap();
+
+                    Boolean lRetCode = imageUtils().ScaleBitmapFromFile(rec.cover, getContentResolver(), myBitmap);
+                    if (!lRetCode)
+                        return;
+
+                    // assign new bitmap and set scale type
+                    imageBook.setImageBitmap(myBitmap.Value);
+                }
             }
         }
 
@@ -75,7 +92,6 @@ public class NoteBookActivity extends AppCompatActivity  implements View.OnClick
             public void onClick(View view)
             {
                 if(action.compareTo("add")==0) {
-                    RecordNoteBook rec = new RecordNoteBook();
                     rec.setId(Database.MyDatabase().getNextNoteBookId());
                     rec.setName(edtName.getEditText().getText().toString());
                     rec.setShortDescription(edtShortDescription.getEditText().getText().toString());
@@ -98,6 +114,33 @@ public class NoteBookActivity extends AppCompatActivity  implements View.OnClick
         });
 
     }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent imageReturnedIntent)
+    {
+        super.onActivityResult(requestCode, resultCode, imageReturnedIntent);
+            switch(requestCode)
+            {
+                case SELECT_INTERNAL_PHOTO:
+                    if(resultCode == RESULT_OK)
+                    {
+                            MyBitmap myBitmap=new MyBitmap();
+                            String lfile=imageReturnedIntent.getStringExtra("selectedfile");
+                            Boolean lRetCode=imageUtils().ScaleBitmapFromFile(lfile, getContentResolver(), myBitmap);
+                            if(!lRetCode)
+                                return;
+
+                            // assign new bitmap and set scale type
+                            imageBook.setImageBitmap(myBitmap.Value);
+
+                            rec.cover=lfile;
+                    }
+                    break;
+            }
+
+    }
+
+
 
     public void onClick(View view)
     {

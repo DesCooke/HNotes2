@@ -5,6 +5,7 @@ public class RecordNoteBook {
     private String name;
     private String shortDescription;
     public int PageCount;
+    public String cover;
 
     public RecordNoteBook()
     {
@@ -12,14 +13,16 @@ public class RecordNoteBook {
         name = "";
         shortDescription = "";
         PageCount = 0;
+        cover="";
     }
 
-    public RecordNoteBook(int id, String name, String shortDescription)
+    public RecordNoteBook(int id, String name, String shortDescription, String cover)
     {
         this.id = id;
         this.name = name;
         this.shortDescription = shortDescription;
         this.PageCount = 0;
+        this.cover=cover;
     }
 
     public void setId(int id)

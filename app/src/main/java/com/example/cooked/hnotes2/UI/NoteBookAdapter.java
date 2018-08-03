@@ -8,7 +8,11 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.example.cooked.hnotes2.Database.RecordNoteBook;
+import com.example.cooked.hnotes2.MainActivity;
 import com.example.cooked.hnotes2.R;
+import com.example.cooked.hnotes2.Utils.MyBitmap;
+
+import static com.example.cooked.hnotes2.Utils.ImageUtils.imageUtils;
 
 public class NoteBookAdapter extends RecyclerView.Adapter<NoteBookAdapter.ViewHolder>
 {
@@ -67,6 +71,18 @@ public class NoteBookAdapter extends RecyclerView.Adapter<NoteBookAdapter.ViewHo
     {
         final RecordNoteBook c = mDataset[position];
         holder.mName.setText(mDataset[position].getName());
+
+        if(c.cover.length() > 0) {
+            MyBitmap myBitmap = new MyBitmap();
+
+            Boolean lRetCode = imageUtils().ScaleBitmapFromFile(c.cover, MainActivity.getInstance().getContentResolver(), myBitmap);
+            if (!lRetCode)
+                return;
+
+            // assign new bitmap and set scale type
+            holder.mImageView.setImageBitmap(myBitmap.Value);
+        }
+
         holder.mImageView.setOnClickListener(new View.OnClickListener()
         {
             @Override

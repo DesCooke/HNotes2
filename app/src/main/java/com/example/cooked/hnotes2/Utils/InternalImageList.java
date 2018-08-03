@@ -63,7 +63,7 @@ public class InternalImageList extends AppCompatActivity
                 recyclerView.setLayoutManager(new LinearLayoutManager(this));
             } else
             {
-                recyclerView.setLayoutManager(new GridLayoutManager(this, 4));
+                recyclerView.setLayoutManager(new GridLayoutManager(this, 3));
             }
             recyclerView.setHasFixedSize(true);
             //listView1.setDivider(null);

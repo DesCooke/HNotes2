@@ -34,7 +34,8 @@ public class TableNoteBook extends TableBase
                         " (" +
                         "   Id INTEGER PRIMARY KEY, " +
                         "   Name TEXT, " +
-                        "   ShortDescription TEXT " +
+                        "   ShortDescription TEXT, " +
+                        "   Cover TEXT " +
                         ") ";
 
         db.execSQL(lSql);
@@ -46,11 +47,12 @@ public class TableNoteBook extends TableBase
 
         String lSql =
                 "INSERT INTO NoteBook " +
-                        "(Id, Name, ShortDescription) " +
+                        "(Id, Name, ShortDescription, Cover) " +
                         "VALUES " +
                         "( " + recordNoteBook.getId() + ", " +
                         " '" + recordNoteBook.getName() + "', " +
-                        " '" + recordNoteBook.getShortDescription() + "'" +
+                        " '" + recordNoteBook.getShortDescription() + "', " +
+                        " '" + recordNoteBook.cover + "' " +
                         ") ";
 
         db.execSQL(lSql);
@@ -63,7 +65,7 @@ public class TableNoteBook extends TableBase
         SQLiteDatabase db = helper.getReadableDatabase();
 
         String lSql =
-                "select Id, Name, ShortDescription " +
+                "select Id, Name, ShortDescription, Cover " +
                         "FROM NoteBook " +
                         "WHERE Id = " + String.valueOf(id);
         Cursor cursor = db.rawQuery(lSql, null);
@@ -72,7 +74,7 @@ public class TableNoteBook extends TableBase
         {
             cursor.moveToFirst();
             RecordNoteBook noteBook = new RecordNoteBook(Integer.parseInt(cursor.getString(0)),
-                    cursor.getString(1), cursor.getString(2));
+                    cursor.getString(1), cursor.getString(2), cursor.getString(3));
             return noteBook;
         }
         return null;
@@ -80,6 +82,10 @@ public class TableNoteBook extends TableBase
 
     public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion)
     {
+        if(oldVersion==2&&newVersion==3)
+        {
+            db.execSQL("ALTER TABLE NoteBook ADD COLUMN cover TEXT DEFAULT ''");
+        }
     }
 
     public void onDowngrade(SQLiteDatabase db, int oldVersion, int newVersion)
@@ -108,7 +114,7 @@ public class TableNoteBook extends TableBase
         SQLiteDatabase db = helper.getReadableDatabase();
 
         String lSql =
-                "select Id, Name, ShortDescription " +
+                "select Id, Name, ShortDescription, Cover " +
                         "FROM NoteBook " +
                         "ORDER BY Name";
         Cursor cursor = db.rawQuery(lSql, null);
@@ -125,7 +131,7 @@ public class TableNoteBook extends TableBase
             do
             {
                 list[cnt] = new RecordNoteBook(Integer.parseInt(cursor.getString(0)),
-                        cursor.getString(1), cursor.getString(2));
+                        cursor.getString(1), cursor.getString(2), cursor.getString(3));
                 cnt++;
             } while(cursor.moveToNext());
         }
@@ -139,7 +145,8 @@ public class TableNoteBook extends TableBase
         String lSql =
                 "UPDATE NoteBook " +
                         "SET Name = '" + recordNoteBook.getName() + "', " +
-                        "    ShortDescription = '" + recordNoteBook.getShortDescription() + "' " +
+                        "    ShortDescription = '" + recordNoteBook.getShortDescription() + "', " +
+                        "    Cover = '" + recordNoteBook.cover + "' " +
                         "WHERE Id = " + recordNoteBook.getId();
 
         db.execSQL(lSql);
