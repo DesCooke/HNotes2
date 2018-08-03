@@ -36,6 +36,7 @@ public class PageActivity extends AppCompatActivity {
     public int lastPage;
     public ViewPager viewPager;
     public ImageView iconEdit;
+    public int nextPage;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -48,7 +49,7 @@ public class PageActivity extends AppCompatActivity {
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
-
+        nextPage = -1;
         noteBookId = 0;
         action = "";
         Bundle extras = getIntent().getExtras();
@@ -122,7 +123,14 @@ public class PageActivity extends AppCompatActivity {
         });
         lPage = viewPager.getCurrentItem();
         viewPager.setAdapter(new PageAdapter(this, noteBookId, recordPageList));
-        viewPager.setCurrentItem(lPage);
+        if(nextPage != -1)
+        {
+            viewPager.setCurrentItem(nextPage);
+            nextPage = -1;
+        }
+        else {
+            viewPager.setCurrentItem(lPage);
+        }
         viewPager.addOnPageChangeListener(new ViewPager.OnPageChangeListener() {
             @Override
             public void onPageScrolled(int position, float positionOffset, int positionOffsetPixels) {
@@ -138,17 +146,7 @@ public class PageActivity extends AppCompatActivity {
 
                 setTitle(recordNoteBook.getName() + ", " + (position+1) + " of " + recordNoteBook.PageCount);
 
-                View lview = getPreviousView();
-                if(lview!=null)
-                {
-                    EditText edtPageText = lview.findViewById(R.id.edtPageText);
-                    TextView txtPageIndex = lview.findViewById(R.id.txtPageIndex);
-                    TextView txtPageText = lview.findViewById(R.id.txtPageText);
-                    int pageIndex = Integer.parseInt(txtPageIndex.getText().toString());
-                    recordPageList[pageIndex].setContent(edtPageText.getText().toString());
-                    txtPageText.setText(edtPageText.getText().toString());
-                    Database.MyDatabase().updatePage(recordPageList[pageIndex]);
-                }
+                SavePreviousPage();
 
                 currentPage=position;
             }
@@ -159,6 +157,37 @@ public class PageActivity extends AppCompatActivity {
             }
         });
     }
+
+    public void SavePreviousPage()
+    {
+        View lview = getPreviousView();
+        if(lview!=null)
+        {
+            EditText edtPageText = lview.findViewById(R.id.edtPageText);
+            TextView txtPageIndex = lview.findViewById(R.id.txtPageIndex);
+            TextView txtPageText = lview.findViewById(R.id.txtPageText);
+            int pageIndex = Integer.parseInt(txtPageIndex.getText().toString());
+            recordPageList[pageIndex].setContent(edtPageText.getText().toString());
+            txtPageText.setText(edtPageText.getText().toString());
+            Database.MyDatabase().updatePage(recordPageList[pageIndex]);
+        }
+    }
+
+    public void SaveCurrentPage()
+    {
+        View lview = getCurrentView();
+        if(lview!=null)
+        {
+            EditText edtPageText = lview.findViewById(R.id.edtPageText);
+            TextView txtPageIndex = lview.findViewById(R.id.txtPageIndex);
+            TextView txtPageText = lview.findViewById(R.id.txtPageText);
+            int pageIndex = Integer.parseInt(txtPageIndex.getText().toString());
+            recordPageList[pageIndex].setContent(edtPageText.getText().toString());
+            txtPageText.setText(edtPageText.getText().toString());
+            Database.MyDatabase().updatePage(recordPageList[pageIndex]);
+        }
+    }
+
     @Override
     protected void onStop()
     {
@@ -197,6 +226,7 @@ public class PageActivity extends AppCompatActivity {
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
+        SaveCurrentPage();
         switch (item.getItemId()) {
             case R.id.mnuAddPageToEnd:
                 RecordPage recp = new RecordPage();
@@ -205,12 +235,34 @@ public class PageActivity extends AppCompatActivity {
                 recp.setPageNo(Database.MyDatabase().getNextPageNo(noteBookId));
                 recp.setContent("<empty>");
                 Database.MyDatabase().addPage(recp);
+                PageActivity.editMode = true;
+                nextPage = Database.MyDatabase().getPageCount(noteBookId)-1;
                 refreshBook();
 
                 break;
             case R.id.mnuAddPageAfter:
+                RecordPage currPage2 = recordPageList[PageActivity.currPageIndex];
+                RecordPage recp2 = new RecordPage();
+                recp2.setNoteBookId(noteBookId);
+                recp2.setId(Database.MyDatabase().getNextPageId());
+                recp2.setPageNo(Database.MyDatabase().getNextPageNo(noteBookId));
+                recp2.setContent("<empty>");
+                Database.MyDatabase().addAfterPage(currPage2, recp2);
+                PageActivity.editMode = true;
+                nextPage = PageActivity.currPageIndex+1;
+                refreshBook();
                 break;
             case R.id.mnuAddPageBefore:
+                RecordPage currPage3 = recordPageList[PageActivity.currPageIndex];
+                RecordPage recp3 = new RecordPage();
+                recp3.setNoteBookId(noteBookId);
+                recp3.setId(Database.MyDatabase().getNextPageId());
+                recp3.setPageNo(Database.MyDatabase().getNextPageNo(noteBookId));
+                recp3.setContent("<empty>");
+                Database.MyDatabase().addBeforePage(currPage3, recp3);
+                PageActivity.editMode = true;
+                nextPage = PageActivity.currPageIndex;
+                refreshBook();
                 break;
             case R.id.mnuDeletePage:
                 Database.MyDatabase().deletePage(recordPageList[PageActivity.currPageIndex]);

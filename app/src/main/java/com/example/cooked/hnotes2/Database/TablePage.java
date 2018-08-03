@@ -42,6 +42,8 @@ public class TablePage extends TableBase
     {
         SQLiteDatabase db = helper.getWritableDatabase();
 
+        recordPage.setContent(HandleSingleQuotes(recordPage.getContent()));
+
         String lSql =
                 "INSERT INTO Page " +
                         "(Id, NoteBookId, PageNo, Content) " +
@@ -50,6 +52,64 @@ public class TablePage extends TableBase
                         "  " + recordPage.getNoteBookId() + ", " +
                         "  " + recordPage.getPageNo() + ", " +
                         " '" + recordPage.getContent() + "' " +
+                        ") ";
+
+        db.execSQL(lSql);
+    }
+
+    public void addAfterItem(SQLiteOpenHelper helper, RecordPage currPage, RecordPage newPage)
+    {
+        SQLiteDatabase db = helper.getWritableDatabase();
+
+        String lSql =
+                "UPDATE Page " +
+                        "SET PageNo = PageNo + 1 " +
+                        "WHERE NoteBookId = " + currPage.getNoteBookId() + " " +
+                        "AND PageNo > " + currPage.getPageNo();
+
+        db.execSQL(lSql);
+
+        newPage.setPageNo(currPage.getPageNo() + 1);
+
+        newPage.setContent(HandleSingleQuotes(newPage.getContent()));
+
+        lSql =
+                "INSERT INTO Page " +
+                        "(Id, NoteBookId, PageNo, Content) " +
+                        "VALUES " +
+                        "( " + newPage.getId() + ", " +
+                        "  " + newPage.getNoteBookId() + ", " +
+                        "  " + newPage.getPageNo() + ", " +
+                        " '" + newPage.getContent() + "' " +
+                        ") ";
+
+        db.execSQL(lSql);
+    }
+
+    public void addBeforeItem(SQLiteOpenHelper helper, RecordPage currPage, RecordPage newPage)
+    {
+        SQLiteDatabase db = helper.getWritableDatabase();
+
+        String lSql =
+                "UPDATE Page " +
+                        "SET PageNo = PageNo + 1 " +
+                        "WHERE NoteBookId = " + currPage.getNoteBookId() + " " +
+                        "AND PageNo >= " + currPage.getPageNo();
+
+        db.execSQL(lSql);
+
+        newPage.setPageNo(currPage.getPageNo());
+
+        newPage.setContent(HandleSingleQuotes(newPage.getContent()));
+
+        lSql =
+                "INSERT INTO Page " +
+                        "(Id, NoteBookId, PageNo, Content) " +
+                        "VALUES " +
+                        "( " + newPage.getId() + ", " +
+                        "  " + newPage.getNoteBookId() + ", " +
+                        "  " + newPage.getPageNo() + ", " +
+                        " '" + newPage.getContent() + "' " +
                         ") ";
 
         db.execSQL(lSql);
@@ -183,6 +243,8 @@ public class TablePage extends TableBase
     {
         SQLiteDatabase db = helper.getWritableDatabase();
 
+        recordPage.setContent(HandleSingleQuotes(recordPage.getContent()));
+
         String lSql =
                 "UPDATE Page " +
                         "SET Content = '" + recordPage.getContent() + "', " +
@@ -208,4 +270,5 @@ public class TablePage extends TableBase
 
         db.execSQL(lSql);
     }
+
 }

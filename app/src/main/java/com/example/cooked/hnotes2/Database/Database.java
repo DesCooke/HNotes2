@@ -114,6 +114,16 @@ public class Database extends SQLiteOpenHelper
         tablePage.addItem(this, recordPage);
     }
 
+    public void addAfterPage(RecordPage currPage, RecordPage newPage)
+    {
+        tablePage.addAfterItem(this, currPage, newPage);
+    }
+
+    public void addBeforePage(RecordPage currPage, RecordPage newPage)
+    {
+        tablePage.addBeforeItem(this, currPage, newPage);
+    }
+
     public RecordPage getPage(int id)
     {
         return tablePage.getItem(this, id);
@@ -144,6 +154,10 @@ public class Database extends SQLiteOpenHelper
         tablePage.deleteItem(this, recordPage);
     }
 
+    public int getPageCount(int noteBookId)
+    {
+        return(tablePage.getPageCount(this, noteBookId));
+    }
     public void deleteAllPages(int noteBookId)
     {
         tablePage.deleteAll(this, noteBookId);
