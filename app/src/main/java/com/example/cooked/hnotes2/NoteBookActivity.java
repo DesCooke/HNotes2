@@ -1,5 +1,6 @@
 package com.example.cooked.hnotes2;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.design.widget.TextInputLayout;
 import android.support.v7.app.AppCompatActivity;
@@ -10,9 +11,10 @@ import android.widget.ImageView;
 
 import com.example.cooked.hnotes2.Database.Database;
 import com.example.cooked.hnotes2.Database.RecordNoteBook;
+import com.example.cooked.hnotes2.Utils.InternalImageList;
 
-public class NoteBookActivity extends AppCompatActivity {
-
+public class NoteBookActivity extends AppCompatActivity  implements View.OnClickListener
+{
     public ImageView imageBook;
     public Button btnOk;
     public Button btnCancel;
@@ -21,6 +23,8 @@ public class NoteBookActivity extends AppCompatActivity {
     public TextInputLayout edtName;
     public TextInputLayout edtShortDescription;
     public RecordNoteBook rec;
+    public final int SELECT_DEVICE_PHOTO=1;
+    public final int SELECT_INTERNAL_PHOTO=2;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -36,6 +40,8 @@ public class NoteBookActivity extends AppCompatActivity {
 
         btnOk = findViewById(R.id.btnOk);
         btnCancel = findViewById(R.id.btnCancel);
+
+        imageBook.setOnClickListener(this);
 
         noteBookId = 0;
         action="";
@@ -91,6 +97,22 @@ public class NoteBookActivity extends AppCompatActivity {
             }
         });
 
+    }
+
+    public void onClick(View view)
+    {
+        switch(view.getId())
+        {
+            case R.id.imageBook:
+                pickImage(view);
+                break;
+        }
+    }
+
+    public void pickImage(View view)
+    {
+        Intent intent=new Intent(getApplicationContext(), InternalImageList.class);
+        startActivityForResult(intent, SELECT_INTERNAL_PHOTO);
     }
 
 
