@@ -4,9 +4,12 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
+import android.support.design.widget.NavigationView;
 import android.support.design.widget.Snackbar;
+import android.support.v4.view.GravityCompat;
 import android.support.v4.view.PagerAdapter;
 import android.support.v4.view.ViewPager;
+import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
@@ -16,6 +19,7 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.EditText;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -23,8 +27,12 @@ import com.example.cooked.hnotes2.Database.Database;
 import com.example.cooked.hnotes2.Database.RecordNoteBook;
 import com.example.cooked.hnotes2.Database.RecordPage;
 import com.example.cooked.hnotes2.UI.PageAdapter;
+import com.example.cooked.hnotes2.Utils.MyBitmap;
 
-public class PageActivity extends AppCompatActivity {
+import static com.example.cooked.hnotes2.Utils.ImageUtils.imageUtils;
+
+public class PageActivity extends AppCompatActivity
+        implements NavigationView.OnNavigationItemSelectedListener{
 
     public static boolean editMode;
     public static int currPageIndex;
@@ -39,6 +47,11 @@ public class PageActivity extends AppCompatActivity {
     public ViewPager viewPager;
     public ImageView iconEdit;
     public int nextPage;
+    public ImageView imgCover;
+    public TextView txtName;
+    public TextView txtShortDescription;
+    public NavigationView navigationView;
+    public DrawerLayout mDrawerLayout;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -51,6 +64,37 @@ public class PageActivity extends AppCompatActivity {
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
+        navigationView = (NavigationView) findViewById(R.id.nav_view);
+        mDrawerLayout = (DrawerLayout) findViewById(R.id.drawer_layout);
+        View headerView = navigationView.getHeaderView(0);
+        imgCover = headerView.findViewById(R.id.imgCover);
+        txtName= headerView.findViewById(R.id.txtName);
+        txtShortDescription = headerView.findViewById(R.id.txtShortDescription);
+
+        navigationView.setNavigationItemSelectedListener(this);
+
+        mDrawerLayout.addDrawerListener(
+                new DrawerLayout.DrawerListener() {
+                    @Override
+                    public void onDrawerSlide(View drawerView, float slideOffset) {
+                    }
+
+                    @Override
+                    public void onDrawerOpened(View drawerView) {
+                        savePage();
+                    }
+
+                    @Override
+                    public void onDrawerClosed(View drawerView) {
+                        // Respond when the drawer is closed
+                    }
+
+                    @Override
+                    public void onDrawerStateChanged(int newState) {
+                        // Respond when the drawer motion state changes
+                    }
+                }
+        );
         nextPage = -1;
         noteBookId = 0;
         action = "";
@@ -110,6 +154,16 @@ public class PageActivity extends AppCompatActivity {
             PageActivity.editMode = true;
             recordNoteBook = Database.MyDatabase().getNoteBook(noteBookId);
         }
+
+        MyBitmap myBitmap = new MyBitmap();
+
+        Boolean lRetCode = imageUtils().ScaleBitmapFromFile(recordNoteBook.cover, MainActivity.getInstance().getContentResolver(), myBitmap);
+        if (!lRetCode)
+            return;
+        imgCover.setImageBitmap(myBitmap.Value);
+
+        txtName.setText(recordNoteBook.getName());
+        txtShortDescription.setText(recordNoteBook.getShortDescription());
 
         recordPageList = Database.MyDatabase().getPageList(noteBookId);
         setTitle(recordNoteBook.getName() + ", 1 of " + recordNoteBook.PageCount);
@@ -171,6 +225,13 @@ public class PageActivity extends AppCompatActivity {
 
             }
         });
+
+        Menu menu = navigationView.getMenu();
+        menu.clear();
+        for(int i=0;i<recordPageList.length;i++) {
+            menu.add(102, i, Menu.NONE, "Page " + (i+1) + ", " + recordPageList[i].getContent());
+        }
+
     }
 
     public void SavePreviousPage()
@@ -221,6 +282,13 @@ public class PageActivity extends AppCompatActivity {
                 Database.MyDatabase().updatePage(recordPageList[pageIndex]);
             }
         }
+        Menu menu = navigationView.getMenu();
+        menu.clear();
+        for(int i=0;i<recordPageList.length;i++) {
+            menu.add(102, i, Menu.NONE, "Page " + (i+1) + ", " + recordPageList[i].getContent());
+        }
+
+
     }
 
     @Override
@@ -336,6 +404,17 @@ public class PageActivity extends AppCompatActivity {
                 break;
         }
 
+        return true;
+    }
+
+    @Override
+    public boolean onNavigationItemSelected(MenuItem item) {
+        // Handle navigation view item clicks here.
+        nextPage = item.getItemId();
+        refreshBook();
+
+        DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
+        drawer.closeDrawer(GravityCompat.START);
         return true;
     }
 
