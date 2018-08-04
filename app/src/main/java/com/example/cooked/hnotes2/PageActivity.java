@@ -155,12 +155,14 @@ public class PageActivity extends AppCompatActivity
             recordNoteBook = Database.MyDatabase().getNoteBook(noteBookId);
         }
 
-        MyBitmap myBitmap = new MyBitmap();
+        if(recordNoteBook.cover.length() > 0) {
+            MyBitmap myBitmap = new MyBitmap();
 
-        Boolean lRetCode = imageUtils().ScaleBitmapFromFile(recordNoteBook.cover, MainActivity.getInstance().getContentResolver(), myBitmap);
-        if (!lRetCode)
-            return;
-        imgCover.setImageBitmap(myBitmap.Value);
+            Boolean lRetCode = imageUtils().ScaleBitmapFromFile(recordNoteBook.cover, MainActivity.getInstance().getContentResolver(), myBitmap);
+            if (!lRetCode)
+                return;
+            imgCover.setImageBitmap(myBitmap.Value);
+        }
 
         txtName.setText(recordNoteBook.getName());
         txtShortDescription.setText(recordNoteBook.getShortDescription());
