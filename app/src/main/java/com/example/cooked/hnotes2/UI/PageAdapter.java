@@ -4,6 +4,7 @@ import android.content.Context;
 import android.support.v4.view.PagerAdapter;
 import android.text.Editable;
 import android.text.TextWatcher;
+import android.text.method.ScrollingMovementMethod;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -39,8 +40,10 @@ public class PageAdapter extends PagerAdapter {
         edtPageText.setText(recordPageList[position].getContent());
         txtPageText = layout.findViewById(R.id.txtPageText);
         txtPageText.setText(recordPageList[position].getContent());
+        txtPageText.setMovementMethod(new ScrollingMovementMethod());
         txtPageIndex = layout.findViewById(R.id.txtPageIndex);
         txtPageIndex.setText(String.valueOf(position));
+
         if(PageActivity.editMode)
         {
             txtPageText.setVisibility(View.INVISIBLE);
