@@ -43,6 +43,8 @@ public class TablePage extends TableBase
     {
         SQLiteDatabase db = helper.getWritableDatabase();
 
+        String lOrigContent=recordPage.getContent();
+
         recordPage.setContent(HandleSingleQuotes(recordPage.getContent()));
 
         String lSql =
@@ -57,6 +59,8 @@ public class TablePage extends TableBase
                         ") ";
 
         db.execSQL(lSql);
+
+        recordPage.setContent(lOrigContent);
     }
 
     public void addAfterItem(SQLiteOpenHelper helper, RecordPage currPage, RecordPage newPage)
@@ -73,6 +77,8 @@ public class TablePage extends TableBase
 
         newPage.setPageNo(currPage.getPageNo() + 1);
 
+        String lOrigContent=newPage.getContent();
+
         newPage.setContent(HandleSingleQuotes(newPage.getContent()));
 
         lSql =
@@ -87,6 +93,7 @@ public class TablePage extends TableBase
                         ") ";
 
         db.execSQL(lSql);
+        newPage.setContent(lOrigContent);
     }
 
     public void addBeforeItem(SQLiteOpenHelper helper, RecordPage currPage, RecordPage newPage)
@@ -103,6 +110,7 @@ public class TablePage extends TableBase
 
         newPage.setPageNo(currPage.getPageNo());
 
+        String lOrigContent=newPage.getContent();
         newPage.setContent(HandleSingleQuotes(newPage.getContent()));
 
         lSql =
@@ -117,6 +125,7 @@ public class TablePage extends TableBase
                         ") ";
 
         db.execSQL(lSql);
+        newPage.setContent(lOrigContent);
     }
 
     public RecordPage getItem(SQLiteOpenHelper helper, int id)
@@ -260,6 +269,7 @@ public class TablePage extends TableBase
     {
         SQLiteDatabase db = helper.getWritableDatabase();
 
+        String lOrigContent=recordPage.getContent();
         recordPage.setContent(HandleSingleQuotes(recordPage.getContent()));
 
         String lSql =
@@ -270,6 +280,7 @@ public class TablePage extends TableBase
                         "WHERE Id = " + recordPage.getId();
 
         db.execSQL(lSql);
+        recordPage.setContent(lOrigContent);
     }
 
     public void deleteItem(SQLiteOpenHelper helper, RecordPage recordPage)
