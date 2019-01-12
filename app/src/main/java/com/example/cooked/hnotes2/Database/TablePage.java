@@ -32,7 +32,8 @@ public class TablePage extends TableBase
                         "   Id INTEGER PRIMARY KEY, " +
                         "   NoteBookId INTEGER, " +
                         "   PageNo INTEGER, " +
-                        "   Content TEXT " +
+                        "   Content TEXT, " +
+                        "   PageIndent INTEGER " +
                         ") ";
 
         db.execSQL(lSql);
@@ -46,12 +47,13 @@ public class TablePage extends TableBase
 
         String lSql =
                 "INSERT INTO Page " +
-                        "(Id, NoteBookId, PageNo, Content) " +
+                        "(Id, NoteBookId, PageNo, Content, PageIndent) " +
                         "VALUES " +
                         "( " + recordPage.getId() + ", " +
                         "  " + recordPage.getNoteBookId() + ", " +
                         "  " + recordPage.getPageNo() + ", " +
-                        " '" + recordPage.getContent() + "' " +
+                        " '" + recordPage.getContent() + "', " +
+                        "  " + recordPage.getPageIndent() + " " +
                         ") ";
 
         db.execSQL(lSql);
@@ -75,12 +77,13 @@ public class TablePage extends TableBase
 
         lSql =
                 "INSERT INTO Page " +
-                        "(Id, NoteBookId, PageNo, Content) " +
+                        "(Id, NoteBookId, PageNo, Content, PageIndent) " +
                         "VALUES " +
                         "( " + newPage.getId() + ", " +
                         "  " + newPage.getNoteBookId() + ", " +
                         "  " + newPage.getPageNo() + ", " +
-                        " '" + newPage.getContent() + "' " +
+                        " '" + newPage.getContent() + "', " +
+                        "  " + newPage.getPageIndent() + " " +
                         ") ";
 
         db.execSQL(lSql);
@@ -104,12 +107,13 @@ public class TablePage extends TableBase
 
         lSql =
                 "INSERT INTO Page " +
-                        "(Id, NoteBookId, PageNo, Content) " +
+                        "(Id, NoteBookId, PageNo, Content, PageIndent) " +
                         "VALUES " +
                         "( " + newPage.getId() + ", " +
                         "  " + newPage.getNoteBookId() + ", " +
                         "  " + newPage.getPageNo() + ", " +
-                        " '" + newPage.getContent() + "' " +
+                        " '" + newPage.getContent() + "', " +
+                        "  " + newPage.getPageIndent() + " " +
                         ") ";
 
         db.execSQL(lSql);
@@ -120,7 +124,7 @@ public class TablePage extends TableBase
         SQLiteDatabase db = helper.getReadableDatabase();
 
         String lSql =
-                "select Id, NoteBookId, PageNo, Content " +
+                "select Id, NoteBookId, PageNo, Content, PageIndent " +
                         "FROM Page " +
                         "WHERE Id = " + String.valueOf(id);
         Cursor cursor = db.rawQuery(lSql, null);
@@ -134,7 +138,9 @@ public class TablePage extends TableBase
                                     Integer.parseInt(cursor.getString(0)),
                                     Integer.parseInt(cursor.getString(1)),
                                     Integer.parseInt(cursor.getString(2)),
-                                    cursor.getString(3));
+                                    cursor.getString(3),
+                                    Integer.parseInt(cursor.getString(4))
+                                    );
             return page;
         }
         return null;
@@ -145,6 +151,16 @@ public class TablePage extends TableBase
         if(oldVersion == 1 && newVersion==2)
         {
             onCreate(db);
+        }
+        if(oldVersion == 3 && newVersion==4)
+        {
+            db.execSQL("ALTER TABLE page ADD COLUMN PageType INT(5) DEFAULT 0");
+            db.execSQL("UPDATE page SET PageType = 0");
+        }
+        if(oldVersion == 4 && newVersion==5)
+        {
+            db.execSQL("ALTER TABLE page ADD COLUMN PageIndent INT(5) DEFAULT 0");
+            db.execSQL("UPDATE page SET PageIndent = 0");
         }
     }
 
@@ -208,7 +224,7 @@ public class TablePage extends TableBase
         SQLiteDatabase db = helper.getReadableDatabase();
 
         String lSql =
-                "select NoteBookId, PageNo, Id, Content " +
+                "select NoteBookId, PageNo, Id, Content, PageIndent " +
                         "FROM Page " +
                         "WHERE NoteBookId = " + noteBookId + " " +
                         "ORDER BY PageNo ";
@@ -231,7 +247,8 @@ public class TablePage extends TableBase
                                         Integer.parseInt(cursor.getString(0)),
                                         Integer.parseInt(cursor.getString(1)),
                                         Integer.parseInt(cursor.getString(2)),
-                                        cursor.getString(3)
+                                        cursor.getString(3),
+                                        Integer.parseInt(cursor.getString(4))
                                 );
                 cnt++;
             } while(cursor.moveToNext());
@@ -248,7 +265,8 @@ public class TablePage extends TableBase
         String lSql =
                 "UPDATE Page " +
                         "SET Content = '" + recordPage.getContent() + "', " +
-                        " PageNo = " + recordPage.getPageNo() + " " +
+                        " PageNo = " + recordPage.getPageNo() + ", " +
+                        " PageIndent = " + recordPage.getPageIndent() + " " +
                         "WHERE Id = " + recordPage.getId();
 
         db.execSQL(lSql);

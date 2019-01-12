@@ -1,10 +1,17 @@
 package com.example.cooked.hnotes2.Database;
 
+import android.support.annotation.IntDef;
+
+import java.lang.annotation.Retention;
+import java.lang.annotation.RetentionPolicy;
+
 public class RecordPage {
+
     private int noteBookId;
     private int pageNo;
     private int id;
     private String content;
+    private int pageIndent;
 
     public RecordPage()
     {
@@ -12,14 +19,16 @@ public class RecordPage {
         pageNo = 0;
         id = 0;
         content = "";
+        pageIndent = 0;
     }
 
-    public RecordPage(int noteBookId, int pageNo, int id, String content)
+    public RecordPage(int noteBookId, int pageNo, int id, String content, int pageIndent)
     {
         this.noteBookId = noteBookId;
         this.pageNo = pageNo;
         this.id = id;
         this.content = content;
+        this.pageIndent = pageIndent;
     }
 
     public void setNoteBookId(int noteBookId)
@@ -42,6 +51,11 @@ public class RecordPage {
         this.content = content;
     }
 
+    public void setPageIndent(int pageIndent)
+    {
+        this.pageIndent = pageIndent;
+    }
+
     public int getNoteBookId()
     {
         return (noteBookId);
@@ -55,6 +69,11 @@ public class RecordPage {
     public int getId()
     {
         return (id);
+    }
+
+    public int getPageIndent()
+    {
+        return (pageIndent);
     }
 
     public String getContent()

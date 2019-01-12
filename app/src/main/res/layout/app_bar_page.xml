@@ -29,4 +29,19 @@
 
     <include layout="@layout/content_page" />
 
+    <Spinner
+        android:id="@+id/spnPageIndent"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="bottom|end" />
+
+    <TextView
+        android:id="@+id/textView2"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="bottom|left"
+        android:text="Indent"
+        android:textSize="18sp"
+        app:layout_anchor="@id/spnPageIndent" />
+
 </android.support.design.widget.CoordinatorLayout>

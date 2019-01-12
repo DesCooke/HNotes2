@@ -17,9 +17,13 @@ import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.AdapterView;
+import android.widget.ArrayAdapter;
+import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
+import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -52,6 +56,7 @@ public class PageActivity extends AppCompatActivity
     public TextView txtShortDescription;
     public NavigationView navigationView;
     public DrawerLayout mDrawerLayout;
+    public Spinner spnPageIndent;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -70,6 +75,7 @@ public class PageActivity extends AppCompatActivity
         imgCover = headerView.findViewById(R.id.imgCover);
         txtName= headerView.findViewById(R.id.txtName);
         txtShortDescription = headerView.findViewById(R.id.txtShortDescription);
+        spnPageIndent = (Spinner) findViewById(R.id.spnPageIndent);
 
         navigationView.setNavigationItemSelectedListener(this);
 
@@ -202,6 +208,7 @@ public class PageActivity extends AppCompatActivity
         else {
             viewPager.setCurrentItem(lPage);
         }
+
         viewPager.addOnPageChangeListener(new ViewPager.OnPageChangeListener() {
             @Override
             public void onPageScrolled(int position, float positionOffset, int positionOffsetPixels) {
@@ -220,6 +227,9 @@ public class PageActivity extends AppCompatActivity
                 SavePreviousPage();
 
                 currentPage=position;
+
+                spnPageIndent.setSelection(recordPageList[PageActivity.currPageIndex].getPageIndent());
+
             }
 
             @Override
@@ -228,12 +238,79 @@ public class PageActivity extends AppCompatActivity
             }
         });
 
+
+        SetupPageMenu();
+
+    }
+
+    public void SetupPageMenu() {
+        if (recordPageList.length == 0)
+            return;
+        String lFirstPage = recordPageList[0].getContent();
         Menu menu = navigationView.getMenu();
         menu.clear();
-        for(int i=0;i<recordPageList.length;i++) {
-            menu.add(102, i, Menu.NONE, "Page " + (i+1) + ", " + recordPageList[i].getContent());
+        if(recordPageList.length > 0 && recordPageList[0].getPageIndent()>0)
+        {
+            int lIndents[] = new int[10];
+            for(int i=0;i<10;i++)
+                lIndents[i]=0;
+
+            int lCurrIndent=1;
+            for (int i = 0; i < recordPageList.length; i++)
+            {
+                String lIndentStr = "";
+                if(recordPageList[i].getPageIndent()>0) {
+                    lCurrIndent = recordPageList[i].getPageIndent();
+                    lIndents[lCurrIndent - 1]++;
+                    for (int k = lCurrIndent; k < 10; k++)
+                        lIndents[k] = 0;
+
+                    for (int j = 0; j < recordPageList[i].getPageIndent(); j++) {
+                        if (lIndentStr.length() == 0) {
+                            lIndentStr = "" + lIndents[j];
+                        } else {
+                            lIndentStr = lIndentStr + "." + lIndents[j];
+                        }
+                    }
+                    lIndentStr=lIndentStr+" ";
+                    String lSpacing="";
+                    for(int j=1;j<lCurrIndent;j++)
+                    {
+                        lSpacing=lSpacing+"    ";
+                    }
+                    menu.add(102, i, Menu.NONE, lSpacing + lIndentStr + recordPageList[i].getContent() );
+                }
+            }
+        }
+        else
+        {
+            for (int i = 0; i < recordPageList.length; i++) {
+                menu.add(102, i, Menu.NONE, "Page " + (i + 1) + ", " + recordPageList[i].getContent());
+            }
         }
 
+        Integer[] items = new Integer[]{0,1,2,3,4,5,6,7,8,9};
+        ArrayAdapter<Integer> adapter = new ArrayAdapter<Integer>(this,android.R.layout.simple_spinner_item, items);
+        spnPageIndent.setAdapter(adapter);
+
+        spnPageIndent.setSelection(recordPageList[PageActivity.currPageIndex].getPageIndent());
+
+
+        spnPageIndent.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+            @Override
+            public void onItemSelected(AdapterView<?> parent, View view,
+                                       int pos, long id) {
+                int i = PageActivity.currPageIndex;
+                recordPageList[i].setPageIndent(pos);
+                Database.MyDatabase().updatePage(recordPageList[i]);
+            }
+
+            public void onNothingSelected(AdapterView<?> parent) {
+                int i = PageActivity.currPageIndex;
+                recordPageList[i].setPageIndent(0);
+                Database.MyDatabase().updatePage(recordPageList[i]);
+            }
+        });
     }
 
     public void SavePreviousPage()
@@ -284,13 +361,7 @@ public class PageActivity extends AppCompatActivity
                 Database.MyDatabase().updatePage(recordPageList[pageIndex]);
             }
         }
-        Menu menu = navigationView.getMenu();
-        menu.clear();
-        for(int i=0;i<recordPageList.length;i++) {
-            menu.add(102, i, Menu.NONE, "Page " + (i+1) + ", " + recordPageList[i].getContent());
-        }
-
-
+        SetupPageMenu();
     }
 
     @Override
