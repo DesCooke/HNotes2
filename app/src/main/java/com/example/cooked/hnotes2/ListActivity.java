@@ -64,9 +64,31 @@ public class ListActivity extends AppCompatActivity
                 Intent intent = new Intent(getApplicationContext(), ListItemActivity.class);
                 intent.putExtra("ACTION", "add");
                 intent.putExtra("NOTEBOOKID", noteBookId);
-                startActivity(intent);
+                startActivityForResult(intent, getResources().getInteger(R.integer.add_list_item_response));
             }
         });
 
+    }
+
+    public void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        if (requestCode == getResources().getInteger(R.integer.add_list_item_response)) {
+            if(resultCode == RESULT_OK) {
+                int itemId = data.getIntExtra("ITEMID",0);
+                RecordListItem rec=Database.MyDatabase().getListItem(itemId);
+                RecordListItem[] list;
+                list = new RecordListItem[mDataset.length+1];
+                for(int i=0;i<mDataset.length;i++)
+                {
+                    list[i]=mDataset[i];
+                }
+                list[mDataset.length]=rec;
+                mDataset = list;
+
+                mListItemAdapter = new ListItemAdapter(mDataset);
+                mItemList.setAdapter(mListItemAdapter);
+                mListItemAdapter.notifyDataSetChanged();
+            }
+        }
     }
 }
