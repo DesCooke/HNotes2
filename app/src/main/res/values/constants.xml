@@ -4,4 +4,5 @@
     <string name="picture_path">/storage/emulated/0/hnotes/Covers</string>
     <integer name="notebook">0</integer>
     <integer name="list">1</integer>
+    <integer name="add_list_item_response">101</integer>
 </resources>

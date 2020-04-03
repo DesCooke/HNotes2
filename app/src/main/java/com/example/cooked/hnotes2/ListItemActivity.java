@@ -1,5 +1,6 @@
 package com.example.cooked.hnotes2;
 
+import android.content.Intent;
 import android.support.design.widget.TextInputLayout;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
@@ -37,6 +38,11 @@ public class ListItemActivity extends AppCompatActivity
                     item.itemSummary = tilItemSummary.getEditText().getText().toString();
                     item.noteBookId = noteBookId;
                     Database.MyDatabase().addListItem(item);
+
+                    Intent intent = new Intent();
+                    intent.putExtra("ITEMID", item.itemId);
+                    setResult(RESULT_OK, intent);
+
                     finish();
                 }
             }
