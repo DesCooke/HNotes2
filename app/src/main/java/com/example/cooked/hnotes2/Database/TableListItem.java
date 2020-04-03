@@ -4,6 +4,9 @@ import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 
+import java.util.ArrayList;
+import java.util.List;
+
 /**
  * Created by cooked on 14/06/2017.
  */
@@ -212,14 +215,55 @@ public class TableListItem extends TableBase
         db.execSQL(lSql);
     }
 
+    public void AddChildren(SQLiteOpenHelper helper, ArrayList<Integer> list, int parentItemId)
+    {
+        ArrayList<Integer> privateList = new ArrayList<Integer>();
+        if(parentItemId==0)
+            return;
+
+        SQLiteDatabase db = helper.getReadableDatabase();
+
+        String lSql =
+                "select ItemId " +
+                        "FROM ListItem " +
+                        "WHERE parentItemId = " + parentItemId;
+        Cursor cursor = db.rawQuery(lSql, null);
+
+        if (cursor != null && cursor.getCount() > 0)
+        {
+            cursor.moveToFirst();
+            do
+            {
+                privateList.add(Integer.parseInt(cursor.getString(0)));
+            } while(cursor.moveToNext());
+        }
+
+        for(int i=0;i<privateList.size();i++)
+        {
+            AddChildren(helper, list, privateList.get(i));
+            list.add(privateList.get(i));
+        }
+        //cursor.close();
+        //db.close();
+
+    }
     public void deleteItem(SQLiteOpenHelper helper, RecordListItem item)
     {
-        SQLiteDatabase db = helper.getWritableDatabase();
-        String lSql =
-                "DELETE FROM ListItem " +
-                "WHERE ItemId = " + item.itemId;
+        ArrayList<Integer> listToDelete = new ArrayList<Integer>();
 
-        db.execSQL(lSql);
+        AddChildren(helper, listToDelete, item.itemId);
+
+        listToDelete.add(item.itemId);
+
+        SQLiteDatabase db = helper.getWritableDatabase();
+        for(int i=0;i<listToDelete.size();i++)
+        {
+            String lSql =
+                    "DELETE FROM ListItem " +
+                            "WHERE ItemId = " + listToDelete.get(i);
+
+            db.execSQL(lSql);
+        }
     }
 
     public void deleteAll(SQLiteOpenHelper helper, int noteBookId)

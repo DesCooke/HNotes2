@@ -25,6 +25,7 @@ import java.util.List;
 public class ListActivity extends AppCompatActivity
 {
     private final String KEY_RECYCLER_STATE = "recycler_state";
+    private static Bundle mBundleRecyclerViewState;
     FloatingActionButton mFabAdd;
     public int noteBookId;
     public RecordNoteBook recordNoteBook;
@@ -32,7 +33,6 @@ public class ListActivity extends AppCompatActivity
     public RecyclerView mItemList;
     public RecyclerView.LayoutManager mLayoutManager;
     public ListItemAdapter mListItemAdapter;
-    private static Bundle mBundleRecyclerViewState;
 
     protected void refreshTitle()
     {
