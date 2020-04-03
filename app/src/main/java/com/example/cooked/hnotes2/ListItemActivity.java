@@ -21,6 +21,7 @@ import com.example.cooked.hnotes2.Database.Database;
 import com.example.cooked.hnotes2.Database.RecordListItem;
 import com.example.cooked.hnotes2.Database.RecordNoteBook;
 import com.example.cooked.hnotes2.UI.ListItemAdapter;
+import com.example.cooked.hnotes2.UI.ParentAdapter;
 
 public class ListItemActivity extends AppCompatActivity
 {
@@ -36,10 +37,14 @@ public class ListItemActivity extends AppCompatActivity
     public FloatingActionButton mFab;
     public int parentItemId;
     public RecyclerView mSubItemList;
+    public RecyclerView mParentList;
     public TextView mSubItemsCaption;
     public RecordListItem mDataset[];
     public RecyclerView.LayoutManager mLayoutManager;
     public ListItemAdapter mListItemAdapter;
+    public String mParents[];
+    public RecyclerView.LayoutManager mParentLayoutManager;
+    public ParentAdapter mParentListItemAdapter;
 
     @Override
     protected void onCreate(Bundle savedInstanceState)
@@ -50,6 +55,7 @@ public class ListItemActivity extends AppCompatActivity
         tilItemSummary = findViewById(R.id.tilItemSummary);
         mSubItemList = findViewById(R.id.subItemList);
         mSubItemsCaption = findViewById(R.id.subitemscaption);
+        mParentList = findViewById(R.id.parentList);
 
         mFab = findViewById(R.id.fab);
         mFab.setOnClickListener(new View.OnClickListener()
@@ -110,14 +116,14 @@ public class ListItemActivity extends AppCompatActivity
 
             if(action.compareTo("add")==0)
             {
-                setTitle(recordNoteBook.getName() + " - Add");
+                setTitle("List: " + recordNoteBook.getName() + " - Add New Item");
                 mSubItemsCaption.setVisibility(View.GONE);
                 mFab.setVisibility(View.GONE);
                 mSubItemList.setVisibility(View.GONE);
             }
             if(action.compareTo("edit")==0)
             {
-                setTitle(recordNoteBook.getName() + " - Edit");
+                setTitle("List: " + recordNoteBook.getName() + " - Edit Item");
                 itemId=extras.getInt("ITEMID", 0);
                 recordListItem = Database.MyDatabase().getListItem(itemId);
                 tilItemSummary.getEditText().setText(recordListItem.itemSummary);
@@ -127,14 +133,19 @@ public class ListItemActivity extends AppCompatActivity
             }
 
             mDataset = Database.MyDatabase().getListItems(noteBookId, parentItemId);
+            mParents = Database.MyDatabase().getParents(parentItemId);
 
             // use this setting to improve performance if you know that changes
             // in content do not change the layout size of the RecyclerView
             mSubItemList.setHasFixedSize(true);
+            mParentList.setHasFixedSize(true);
 
             // use a linear layout manager
             mLayoutManager = new LinearLayoutManager(this);
             mSubItemList.setLayoutManager(mLayoutManager);
+
+            mParentLayoutManager = new LinearLayoutManager(this);
+            mParentList.setLayoutManager(mParentLayoutManager);
 
             CreateAndAttachAdapter();
 
@@ -160,6 +171,28 @@ public class ListItemActivity extends AppCompatActivity
                 startActivityForResult(intent, getResources().getInteger(R.integer.edit_list_item_response));
             }
         });
+
+        // specify an adapter (see also next example)
+        mParentListItemAdapter = new ParentAdapter(mParents);
+        mParentList.setAdapter(mParentListItemAdapter);
+/*
+        mParentListItemAdapter.setOnItemClickListener(new ParentAdapter.OnItemClickListener()
+        {
+            @Override
+            public void onItemClick(View view, RecordListItem obj)
+            {
+
+                Intent intent = new Intent(getApplicationContext(), ListItemActivity.class);
+                intent.putExtra("ACTION", "edit");
+                intent.putExtra("NOTEBOOKID", obj.noteBookId);
+                intent.putExtra("ITEMID", obj.itemId);
+                startActivityForResult(intent, getResources().getInteger(R.integer.edit_list_item_response));
+
+
+            }
+        });
+
+ */
     }
 
 

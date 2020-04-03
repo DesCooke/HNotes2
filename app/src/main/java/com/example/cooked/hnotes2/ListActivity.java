@@ -37,7 +37,7 @@ public class ListActivity extends AppCompatActivity
     protected void refreshTitle()
     {
         recordNoteBook = Database.MyDatabase().getNoteBook(noteBookId);
-        setTitle(recordNoteBook.getName());
+        setTitle("List: " + recordNoteBook.getName());
     }
     @Override
     protected void onCreate(Bundle savedInstanceState)

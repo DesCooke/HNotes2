@@ -199,6 +199,33 @@ public class TableListItem extends TableBase
         return list;
     }
 
+    public String[] getParents(SQLiteOpenHelper helper, int parentItemId)
+    {
+        ArrayList<String> localParents = new ArrayList<String>();
+        RecordListItem rec;
+
+        rec = getItem(helper, parentItemId);
+
+        int lParentItemId = rec.parentItemId;
+        while(lParentItemId>0)
+        {
+            rec = getItem(helper, lParentItemId);
+            localParents.add(rec.itemSummary);
+            lParentItemId = rec.parentItemId;
+        }
+
+        String[] list = new String[localParents.size()];
+        String lPrefix="    ";
+        int j=0;
+        for(int i=localParents.size()-1;i>=0; i--)
+        {
+            list[j]=lPrefix + localParents.get(i);
+            lPrefix=lPrefix+"    ";
+            j++;
+        }
+        return(list);
+    }
+
     public void updateItem(SQLiteOpenHelper helper, RecordListItem item)
     {
         SQLiteDatabase db = helper.getWritableDatabase();
