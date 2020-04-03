@@ -13,6 +13,18 @@ import com.example.cooked.hnotes2.R;
 public class ListItemAdapter extends RecyclerView.Adapter<ListItemAdapter.ViewHolder>
 {
     private RecordListItem[] mDataset;
+    public OnItemClickListener mOnItemClickListener;
+
+    public interface OnItemClickListener
+    {
+        void onItemClick(View view, RecordListItem obj);
+    }
+
+    public void setOnItemClickListener(final ListItemAdapter.OnItemClickListener mItemClickListener)
+    {
+        this.mOnItemClickListener = mItemClickListener;
+    }
+
 
     // Provide a reference to the views for each data item
     // Complex data items may need more than one view per item, and
@@ -21,11 +33,13 @@ public class ListItemAdapter extends RecyclerView.Adapter<ListItemAdapter.ViewHo
     {
         // each data item is just a string in this case
         public TextView mItemSummary;
+        public LinearLayout mCellFull;
 
         public ViewHolder(View v)
         {
             super(v);
             mItemSummary = (TextView) v.findViewById(R.id.cellItemSummary);
+            mCellFull = v.findViewById(R.id.cell_full);
         }
     }
 
@@ -54,6 +68,18 @@ public class ListItemAdapter extends RecyclerView.Adapter<ListItemAdapter.ViewHo
         // - get element from your dataset at this position
         // - replace the contents of the view with that element
         holder.mItemSummary.setText(mDataset[position].itemSummary);
+
+        holder.mCellFull.setOnClickListener(new View.OnClickListener()
+        {
+            @Override
+            public void onClick(View view)
+            {
+                if (mOnItemClickListener != null)
+                {
+                    mOnItemClickListener.onItemClick(view, mDataset[position]);
+                }
+            }
+        });
     }
 
     // Return the size of your dataset (invoked by the layout manager)
