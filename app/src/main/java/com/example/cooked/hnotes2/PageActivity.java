@@ -51,7 +51,6 @@ public class PageActivity extends AppCompatActivity
     public ViewPager viewPager;
     public ImageView iconEdit;
     public int nextPage;
-    public ImageView imgCover;
     public TextView txtName;
     public TextView txtShortDescription;
     public NavigationView navigationView;
@@ -72,7 +71,6 @@ public class PageActivity extends AppCompatActivity
         navigationView = (NavigationView) findViewById(R.id.nav_view);
         mDrawerLayout = (DrawerLayout) findViewById(R.id.drawer_layout);
         View headerView = navigationView.getHeaderView(0);
-        imgCover = headerView.findViewById(R.id.imgCover);
         txtName= headerView.findViewById(R.id.txtName);
         txtShortDescription = headerView.findViewById(R.id.txtShortDescription);
         spnPageIndent = (Spinner) findViewById(R.id.spnPageIndent);
@@ -159,15 +157,6 @@ public class PageActivity extends AppCompatActivity
             Database.MyDatabase().addPage(recp);
             PageActivity.editMode = true;
             recordNoteBook = Database.MyDatabase().getNoteBook(noteBookId);
-        }
-
-        if(recordNoteBook.cover.length() > 0) {
-            MyBitmap myBitmap = new MyBitmap();
-
-            Boolean lRetCode = imageUtils().ScaleBitmapFromFile(recordNoteBook.cover, MainActivity.getInstance().getContentResolver(), myBitmap);
-            if (!lRetCode)
-                return;
-            imgCover.setImageBitmap(myBitmap.Value);
         }
 
         txtName.setText(recordNoteBook.getName());

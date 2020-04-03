@@ -17,11 +17,12 @@ public class Database extends SQLiteOpenHelper
     // these regions help to compartmentalise the unit
     private TableNoteBook tableNoteBook;
     private TablePage tablePage;
+    private TableListItem tableListItem;
 
     // The version - each change - increment by one
     // if the version increases onUpgrade is called - if decreases - onDowngrade is called
     // if current is 0 (does not exist) onCreate is called
-    private static final int DATABASE_VERSION = 5;
+    private static final int DATABASE_VERSION = 8;
 
     //endregion
 
@@ -40,6 +41,7 @@ public class Database extends SQLiteOpenHelper
         super(context, context.getResources().getString(R.string.database_filename), null, DATABASE_VERSION);
         tableNoteBook = new TableNoteBook();
         tablePage = new TablePage();
+        tableListItem = new TableListItem();
     }
 
     // called when the current database version is 0
@@ -48,6 +50,7 @@ public class Database extends SQLiteOpenHelper
     {
         tableNoteBook.onCreate(db);
         tablePage.onCreate(db);
+        tableListItem.onCreate(db);
     }
 
     // called when the version number increases
@@ -56,6 +59,7 @@ public class Database extends SQLiteOpenHelper
     {
         tableNoteBook.onUpgrade(db, oldVersion, newVersion);
         tablePage.onUpgrade(db, oldVersion, newVersion);
+        tableListItem.onUpgrade(db, oldVersion, newVersion);
     }
 
     // called when the version number decreases
@@ -64,6 +68,7 @@ public class Database extends SQLiteOpenHelper
     {
         tableNoteBook.onDowngrade(db, oldVersion, newVersion);
         tablePage.onDowngrade(db, oldVersion, newVersion);
+        tableListItem.onDowngrade(db, oldVersion, newVersion);
     }
     //endregion
 
@@ -161,6 +166,43 @@ public class Database extends SQLiteOpenHelper
     public void deleteAllPages(int noteBookId)
     {
         tablePage.deleteAll(this, noteBookId);
+    }
+    //endregion
+
+    //region ListItem
+    public void addListItem(RecordListItem item)
+    {
+        tableListItem.addItem(this, item);
+    }
+
+    public RecordListItem getListItem(int id)
+    {
+        return(tableListItem.getItem(this, id));
+    }
+
+    public RecordListItem[] getListItems(int noteBookId, int parentItemId)
+    {
+        return(tableListItem.getList(this, noteBookId, parentItemId));
+    }
+
+    public void updateListItem(RecordListItem item)
+    {
+        tableListItem.updateItem(this, item);
+    }
+
+    public void deleteListItem(RecordListItem item)
+    {
+        tableListItem.deleteItem(this, item);
+    }
+
+    public void deleteAllForNotebook(int noteBookId)
+    {
+        tableListItem.deleteAll(this, noteBookId);
+    }
+
+    public void deleteAllForSubList(SQLiteOpenHelper helper, int noteBookId, int parentItemId)
+    {
+        tableListItem.deleteAllForSubList(this, noteBookId, parentItemId);
     }
     //endregion
 

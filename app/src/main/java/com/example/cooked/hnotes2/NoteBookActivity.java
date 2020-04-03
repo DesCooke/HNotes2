@@ -7,20 +7,15 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.View;
 import android.widget.Button;
-import android.widget.ImageView;
+import android.widget.RadioButton;
+import android.widget.RadioGroup;
 
 import com.example.cooked.hnotes2.Database.Database;
 import com.example.cooked.hnotes2.Database.RecordNoteBook;
-import com.example.cooked.hnotes2.Utils.InternalImageList;
-import com.example.cooked.hnotes2.Utils.MyBitmap;
 
-import static com.example.cooked.hnotes2.Utils.ImageUtils.imageUtils;
-
-public class NoteBookActivity extends AppCompatActivity  implements View.OnClickListener
+public class NoteBookActivity extends AppCompatActivity
 {
-    public ImageView imageBook;
     public Button btnOk;
-    public Button btnCancel;
     public int noteBookId;
     public String action;
     public TextInputLayout edtName;
@@ -28,7 +23,9 @@ public class NoteBookActivity extends AppCompatActivity  implements View.OnClick
     public RecordNoteBook rec;
     public final int SELECT_DEVICE_PHOTO=1;
     public final int SELECT_INTERNAL_PHOTO=2;
-    public String internalImageFilename;
+    public RadioButton radNotebook;
+    public RadioButton radList;
+    public RadioGroup grpNoteBookTypes;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -38,15 +35,13 @@ public class NoteBookActivity extends AppCompatActivity  implements View.OnClick
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
-        internalImageFilename="";
-        imageBook = findViewById(R.id.imageBook);
         edtName = findViewById(R.id.edtName);
         edtShortDescription = findViewById(R.id.edtShortDescription);
+        radNotebook = findViewById(R.id.radNotebook);
+        radList = findViewById(R.id.radList);
+        grpNoteBookTypes = findViewById(R.id.grpNoteBookTypes);
 
         btnOk = findViewById(R.id.btnOk);
-        btnCancel = findViewById(R.id.btnCancel);
-
-        imageBook.setOnClickListener(this);
 
         noteBookId = 0;
         action="";
@@ -55,16 +50,24 @@ public class NoteBookActivity extends AppCompatActivity  implements View.OnClick
         {
             action = extras.getString("ACTION", "");
 
+            grpNoteBookTypes.setEnabled(true);
+            radList.setEnabled(true);
+            radNotebook.setEnabled(true);
+            radList.setChecked(false);
+            radNotebook.setChecked(false);
             if (action.compareTo("add") == 0)
             {
                 toolbar.setTitle("Add a new Note Book");
-
+                grpNoteBookTypes.setEnabled(true);
                 edtName.getEditText().setText("");
                 edtShortDescription.getEditText().setText("");
                 rec = new RecordNoteBook();
             }
 
             if (action.compareTo("modify") == 0) {
+                grpNoteBookTypes.setEnabled(false);
+                radList.setEnabled(false);
+                radNotebook.setEnabled(false);
                 noteBookId = extras.getInt("NOTEBOOKID", 0);
 
                 rec = Database.MyDatabase().getNoteBook(noteBookId);
@@ -74,16 +77,11 @@ public class NoteBookActivity extends AppCompatActivity  implements View.OnClick
                 edtName.getEditText().setText(rec.getName());
                 edtShortDescription.getEditText().setText(rec.getShortDescription());
 
-                if(rec.cover.length() > 0) {
-                    MyBitmap myBitmap = new MyBitmap();
+                if(rec.BookType==getResources().getInteger(R.integer.list))
+                    radList.setChecked(true);
+                if(rec.BookType==getResources().getInteger(R.integer.notebook))
+                    radNotebook.setChecked(true);
 
-                    Boolean lRetCode = imageUtils().ScaleBitmapFromFile(rec.cover, getContentResolver(), myBitmap);
-                    if (!lRetCode)
-                        return;
-
-                    // assign new bitmap and set scale type
-                    imageBook.setImageBitmap(myBitmap.Value);
-                }
             }
         }
 
@@ -95,6 +93,8 @@ public class NoteBookActivity extends AppCompatActivity  implements View.OnClick
                     rec.setId(Database.MyDatabase().getNextNoteBookId());
                     rec.setName(edtName.getEditText().getText().toString());
                     rec.setShortDescription(edtShortDescription.getEditText().getText().toString());
+                    if(radList.isChecked())
+                        rec.BookType=getResources().getInteger(R.integer.list);
                     Database.MyDatabase().addNoteBook(rec);
                 }
                 if(action.compareTo("modify")==0) {
@@ -105,58 +105,6 @@ public class NoteBookActivity extends AppCompatActivity  implements View.OnClick
                 finish();
             }
         });
-        btnCancel.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view)
-            {
-                finish();
-            }
-        });
-
     }
-
-    @Override
-    protected void onActivityResult(int requestCode, int resultCode, Intent imageReturnedIntent)
-    {
-        super.onActivityResult(requestCode, resultCode, imageReturnedIntent);
-            switch(requestCode)
-            {
-                case SELECT_INTERNAL_PHOTO:
-                    if(resultCode == RESULT_OK)
-                    {
-                            MyBitmap myBitmap=new MyBitmap();
-                            String lfile=imageReturnedIntent.getStringExtra("selectedfile");
-                            Boolean lRetCode=imageUtils().ScaleBitmapFromFile(lfile, getContentResolver(), myBitmap);
-                            if(!lRetCode)
-                                return;
-
-                            // assign new bitmap and set scale type
-                            imageBook.setImageBitmap(myBitmap.Value);
-
-                            rec.cover=lfile;
-                    }
-                    break;
-            }
-
-    }
-
-
-
-    public void onClick(View view)
-    {
-        switch(view.getId())
-        {
-            case R.id.imageBook:
-                pickImage(view);
-                break;
-        }
-    }
-
-    public void pickImage(View view)
-    {
-        Intent intent=new Intent(getApplicationContext(), InternalImageList.class);
-        startActivityForResult(intent, SELECT_INTERNAL_PHOTO);
-    }
-
 
 }

@@ -34,6 +34,8 @@ public class MainActivity extends AppCompatActivity
     private RecyclerView mNoteBookList;
     private LinearLayoutManager mLayoutManager;
     private NoteBookAdapter mNoteBookAdapter;
+    public int listAsInt;
+    public int notebookAsInt;
 
     public static MainActivity getInstance()
     {
@@ -56,6 +58,9 @@ public class MainActivity extends AppCompatActivity
         setContentView(R.layout.activity_main);
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
+
+        listAsInt=getResources().getInteger(R.integer.list);
+        notebookAsInt=getResources().getInteger(R.integer.notebook);
 
         FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
         fab.setOnClickListener(new View.OnClickListener() {
@@ -100,7 +105,7 @@ public class MainActivity extends AppCompatActivity
         mNoteBookList.setLayoutManager(mLayoutManager);
 
         // specify an adapter (see also next example)
-        mNoteBookAdapter = new NoteBookAdapter(mDataset);
+        mNoteBookAdapter = new NoteBookAdapter(this, mDataset);
         mNoteBookList.setAdapter(mNoteBookAdapter);
 
 
@@ -111,22 +116,31 @@ public class MainActivity extends AppCompatActivity
             {
                 String lAction="view";
                 RecordNoteBook rec=Database.MyDatabase().getNoteBook(obj.getId());
-                PageActivity.editMode = false;
-                if(rec.PageCount==0)
+                if(rec.BookType==notebookAsInt)
                 {
-                    RecordPage recp = new RecordPage();
-                    recp.setNoteBookId(obj.getId());
-                    recp.setId(Database.MyDatabase().getNextPageId());
-                    recp.setPageNo(Database.MyDatabase().getNextPageNo(obj.getId()));
-                    recp.setContent("");
-                    Database.MyDatabase().addPage(recp);
-                    lAction="edit";
-                    PageActivity.editMode = true;
+                    PageActivity.editMode = false;
+                    if (rec.PageCount == 0)
+                    {
+                        RecordPage recp = new RecordPage();
+                        recp.setNoteBookId(obj.getId());
+                        recp.setId(Database.MyDatabase().getNextPageId());
+                        recp.setPageNo(Database.MyDatabase().getNextPageNo(obj.getId()));
+                        recp.setContent("");
+                        Database.MyDatabase().addPage(recp);
+                        lAction = "edit";
+                        PageActivity.editMode = true;
+                    }
+                    Intent intent = new Intent(getApplicationContext(), PageActivity.class);
+                    intent.putExtra("ACTION", lAction);
+                    intent.putExtra("NOTEBOOKID", obj.getId());
+                    startActivity(intent);
                 }
-                Intent intent = new Intent(getApplicationContext(), PageActivity.class);
-                intent.putExtra("ACTION", lAction);
-                intent.putExtra("NOTEBOOKID", obj.getId());
-                startActivity(intent);
+                if(rec.BookType==listAsInt)
+                {
+                    Intent intent = new Intent(getApplicationContext(), ListActivity.class);
+                    intent.putExtra("NOTEBOOKID", obj.getId());
+                    startActivity(intent);
+                }
             }
         });
 
