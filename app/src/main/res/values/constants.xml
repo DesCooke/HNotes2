@@ -2,4 +2,6 @@
     <string name="database_filename">/storage/emulated/0/hnotes/hnotes.db</string>
     <string name="home_directory">/storage/emulated/0/hnotes</string>
     <string name="picture_path">/storage/emulated/0/hnotes/Covers</string>
+    <integer name="notebook">0</integer>
+    <integer name="list">1</integer>
 </resources>

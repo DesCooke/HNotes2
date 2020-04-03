@@ -1,5 +1,7 @@
 package com.example.cooked.hnotes2.UI;
 
+import android.content.Context;
+import android.graphics.drawable.Drawable;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -16,8 +18,13 @@ import static com.example.cooked.hnotes2.Utils.ImageUtils.imageUtils;
 
 public class NoteBookAdapter extends RecyclerView.Adapter<NoteBookAdapter.ViewHolder>
 {
+    private Context _context;
     private RecordNoteBook[] mDataset;
     public OnItemClickListener mOnItemClickListener;
+    public int listAsInt;
+    public int notebookAsInt;
+    public Drawable listAsDrawable;
+    public Drawable notebookAsDrawable;
 
     public interface OnItemClickListener
     {
@@ -48,9 +55,15 @@ public class NoteBookAdapter extends RecyclerView.Adapter<NoteBookAdapter.ViewHo
     }
 
     // Provide a suitable constructor (depends on the kind of dataset)
-    public NoteBookAdapter(RecordNoteBook[] myDataset)
+    public NoteBookAdapter(Context context, RecordNoteBook[] myDataset)
     {
+        _context = context;
         mDataset = myDataset;
+
+        listAsInt=_context.getResources().getInteger(R.integer.list);
+        notebookAsInt=_context.getResources().getInteger(R.integer.notebook);
+        listAsDrawable=_context.getResources().getDrawable(R.drawable.list);
+        notebookAsDrawable=_context.getResources().getDrawable(R.drawable.notebook);
     }
 
     // Create new views (invoked by the layout manager)
@@ -72,15 +85,14 @@ public class NoteBookAdapter extends RecyclerView.Adapter<NoteBookAdapter.ViewHo
         final RecordNoteBook c = mDataset[position];
         holder.mName.setText(mDataset[position].getName());
 
-        if(c.cover.length() > 0) {
-            MyBitmap myBitmap = new MyBitmap();
-
-            Boolean lRetCode = imageUtils().ScaleBitmapFromFile(c.cover, MainActivity.getInstance().getContentResolver(), myBitmap);
-            if (!lRetCode)
-                return;
-
-            // assign new bitmap and set scale type
-            holder.mImageView.setImageBitmap(myBitmap.Value);
+        // assign new bitmap and set scale type
+        if(c.BookType==listAsInt)
+        {
+            holder.mImageView.setImageDrawable(listAsDrawable);
+        }
+        else
+        {
+            holder.mImageView.setImageDrawable(notebookAsDrawable);
         }
 
         holder.mImageView.setOnClickListener(new View.OnClickListener()

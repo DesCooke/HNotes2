@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    tools:context=".ListItemActivity">
+
+    <android.support.design.widget.TextInputLayout
+        android:id="@+id/tilItemSummary"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+
+        <android.support.design.widget.TextInputEditText
+            android:id="@+id/edtItemSummary"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:hint="Summary" />
+    </android.support.design.widget.TextInputLayout>
+
+    <Button
+        android:id="@+id/btnOk"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Ok" />
+</LinearLayout>

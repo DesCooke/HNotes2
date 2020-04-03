@@ -1,11 +1,14 @@
 package com.example.cooked.hnotes2.Database;
 
+import com.example.cooked.hnotes2.MainActivity;
+import com.example.cooked.hnotes2.R;
+
 public class RecordNoteBook {
     private int id;
     private String name;
     private String shortDescription;
     public int PageCount;
-    public String cover;
+    public int BookType;
 
     public RecordNoteBook()
     {
@@ -13,16 +16,16 @@ public class RecordNoteBook {
         name = "";
         shortDescription = "";
         PageCount = 0;
-        cover="";
+        BookType=MainActivity.getInstance().getResources().getInteger(R.integer.notebook);
     }
 
-    public RecordNoteBook(int id, String name, String shortDescription, String cover)
+    public RecordNoteBook(int id, String name, String shortDescription, int bookType)
     {
         this.id = id;
         this.name = name;
         this.shortDescription = shortDescription;
         this.PageCount = 0;
-        this.cover=cover;
+        this.BookType=bookType;
     }
 
     public void setId(int id)
