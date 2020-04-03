@@ -5,4 +5,5 @@
     <integer name="notebook">0</integer>
     <integer name="list">1</integer>
     <integer name="add_list_item_response">101</integer>
+    <integer name="edit_list_item_response">102</integer>
 </resources>

@@ -58,7 +58,8 @@ public class PageActivity extends AppCompatActivity
     public Spinner spnPageIndent;
 
     @Override
-    protected void onCreate(Bundle savedInstanceState) {
+    protected void onCreate(Bundle savedInstanceState)
+    {
         super.onCreate(savedInstanceState);
         currentPage=0;
         currPageIndex=0;
@@ -109,6 +110,7 @@ public class PageActivity extends AppCompatActivity
             refreshBook();
         }
     }
+
     @Override
     protected void onPause()
     {
@@ -232,7 +234,8 @@ public class PageActivity extends AppCompatActivity
 
     }
 
-    public void SetupPageMenu() {
+    public void SetupPageMenu()
+    {
         if (recordPageList.length == 0)
             return;
         String lFirstPage = recordPageList[0].getContent();
@@ -338,6 +341,7 @@ public class PageActivity extends AppCompatActivity
         super.onStop();
         savePage();
     }
+
     public void savePage()
     {
         for(int i=0;i<recordPageList.length;i++) {
@@ -361,16 +365,17 @@ public class PageActivity extends AppCompatActivity
         refreshBook();
     }
 
-
     @Override
-    public boolean onCreateOptionsMenu(Menu menu) {
+    public boolean onCreateOptionsMenu(Menu menu)
+    {
         MenuInflater inflater = getMenuInflater();
         inflater.inflate(R.menu.menu_page, menu);
         return true;
     }
 
     @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
+    public boolean onOptionsItemSelected(MenuItem item)
+    {
         SaveCurrentPage();
         switch (item.getItemId()) {
             case R.id.mnuAddPageToEnd:
@@ -470,7 +475,8 @@ public class PageActivity extends AppCompatActivity
     }
 
     @Override
-    public boolean onNavigationItemSelected(MenuItem item) {
+    public boolean onNavigationItemSelected(MenuItem item)
+    {
         // Handle navigation view item clicks here.
         nextPage = item.getItemId();
         refreshBook();
