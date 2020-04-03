@@ -1,6 +1,7 @@
 package com.example.cooked.hnotes2;
 
 import android.content.Intent;
+import android.os.Parcelable;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
@@ -17,6 +18,7 @@ import java.util.List;
 
 public class ListActivity extends AppCompatActivity
 {
+    private final String KEY_RECYCLER_STATE = "recycler_state";
     FloatingActionButton mFabAdd;
     public int noteBookId;
     public RecordNoteBook recordNoteBook;
@@ -24,6 +26,7 @@ public class ListActivity extends AppCompatActivity
     public RecyclerView mItemList;
     public RecyclerView.LayoutManager mLayoutManager;
     public ListItemAdapter mListItemAdapter;
+    private static Bundle mBundleRecyclerViewState;
 
     @Override
     protected void onCreate(Bundle savedInstanceState)
@@ -89,6 +92,29 @@ public class ListActivity extends AppCompatActivity
                 mItemList.setAdapter(mListItemAdapter);
                 mListItemAdapter.notifyDataSetChanged();
             }
+        }
+    }
+
+    @Override
+    protected void onPause()
+    {
+        super.onPause();
+
+        // save RecyclerView state
+        mBundleRecyclerViewState = new Bundle();
+        Parcelable listState = mItemList.getLayoutManager().onSaveInstanceState();
+        mBundleRecyclerViewState.putParcelable(KEY_RECYCLER_STATE, listState);
+    }
+
+    @Override
+    protected void onResume()
+    {
+        super.onResume();
+
+        // restore RecyclerView state
+        if (mBundleRecyclerViewState != null) {
+            Parcelable listState = mBundleRecyclerViewState.getParcelable(KEY_RECYCLER_STATE);
+            mItemList.getLayoutManager().onRestoreInstanceState(listState);
         }
     }
 }
