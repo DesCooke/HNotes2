@@ -146,6 +146,12 @@ public class ListItemAdapter
         {
             Collections.swap(mDataset, fromPosition, toPosition);
             notifyItemMoved(fromPosition, toPosition);
+
+            RecordListItem fromItem = mDataset.get(fromPosition);
+            RecordListItem toItem = mDataset.get(toPosition);
+            notifyItemChanged(fromPosition, toItem);
+            notifyItemChanged(toPosition, fromItem);
+
             Database.MyDatabase().subListResequence(mDataset);
         } catch (Exception e)
         {
