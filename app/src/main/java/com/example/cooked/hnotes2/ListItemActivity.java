@@ -126,6 +126,7 @@ public class ListItemActivity extends AppCompatActivity
                 mSubItemsCaption.setVisibility(View.GONE);
                 mFab.setVisibility(View.GONE);
                 mSubItemList.setVisibility(View.GONE);
+                mParents = Database.MyDatabase().getParents(parentItemId, true);
             }
             if(action.compareTo("edit")==0)
             {
@@ -136,10 +137,10 @@ public class ListItemActivity extends AppCompatActivity
                 mSubItemsCaption.setVisibility(View.VISIBLE);
                 mFab.setVisibility(View.VISIBLE);
                 mSubItemList.setVisibility(View.VISIBLE);
+                mParents = Database.MyDatabase().getParents(parentItemId, false);
             }
 
             mDataset = Database.MyDatabase().getListItems(noteBookId, parentItemId);
-            mParents = Database.MyDatabase().getParents(parentItemId);
 
             // use this setting to improve performance if you know that changes
             // in content do not change the layout size of the RecyclerView

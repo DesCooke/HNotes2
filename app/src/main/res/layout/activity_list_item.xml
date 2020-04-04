@@ -22,7 +22,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:hint="Summary"
-            android:textSize="30sp" />
+            android:textSize="18sp" />
     </android.support.design.widget.TextInputLayout>
 
     <Button

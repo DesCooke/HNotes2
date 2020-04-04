@@ -208,7 +208,7 @@ public class TableListItem extends TableBase
     }
 
 
-    public String[] getParents(SQLiteOpenHelper helper, int parentItemId)
+    public String[] getParents(SQLiteOpenHelper helper, int parentItemId, boolean includingThis)
     {
         ArrayList<String> localParents = new ArrayList<String>();
         RecordListItem rec;
@@ -219,14 +219,18 @@ public class TableListItem extends TableBase
             return (list);
         }
 
-        rec = getItem(helper, parentItemId);
-        if(rec==null)
+        int lParentItemId=parentItemId;
+        if(!includingThis)
         {
-            String[] list = new String[0];
-            return (list);
+            rec = getItem(helper, lParentItemId);
+            if (rec == null)
+            {
+                String[] list = new String[0];
+                return (list);
+            }
+            lParentItemId = rec.parentItemId;
         }
 
-        int lParentItemId = rec.parentItemId;
         while(lParentItemId>0)
         {
             rec = getItem(helper, lParentItemId);

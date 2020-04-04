@@ -183,9 +183,9 @@ public class Database extends SQLiteOpenHelper
         return(tableListItem.getItem(this, id));
     }
 
-    public String[] getParents(int id)
+    public String[] getParents(int id, boolean includingThis)
     {
-        return(tableListItem.getParents(this, id));
+        return(tableListItem.getParents(this, id, includingThis));
     }
 
     public ArrayList<RecordListItem> getListItems(int noteBookId, int parentItemId)
