@@ -162,7 +162,7 @@ public class TableListItem extends TableBase
         return(1);
     }
 
-    public RecordListItem[] getList(SQLiteOpenHelper helper, int noteBookId, int parentItemId)
+    public ArrayList<RecordListItem> getList(SQLiteOpenHelper helper, int noteBookId, int parentItemId)
     {
         SQLiteDatabase db = helper.getReadableDatabase();
 
@@ -174,37 +174,57 @@ public class TableListItem extends TableBase
                         "ORDER BY ItemSeqNo ";
         Cursor cursor = db.rawQuery(lSql, null);
 
-        RecordListItem[] list;
-        int cnt;
-        cnt = cursor.getCount();
-        list = new RecordListItem[cnt];
-        cnt=0;
+        ArrayList<RecordListItem> list = new ArrayList<RecordListItem>();
         if (cursor != null && cursor.getCount() > 0)
         {
 
             cursor.moveToFirst();
             do
             {
-                list[cnt] = new RecordListItem();
-                list[cnt].itemId = Integer.parseInt(cursor.getString(0));
-                list[cnt].noteBookId = Integer.parseInt(cursor.getString(1));
-                list[cnt].parentItemId = Integer.parseInt(cursor.getString(2));
-                list[cnt].itemNumber = Integer.parseInt(cursor.getString(3));
-                list[cnt].itemSeqNo = Integer.parseInt(cursor.getString(4));
-                list[cnt].itemSummary = cursor.getString(5);
+                RecordListItem item = new RecordListItem();
+                item.itemId = Integer.parseInt(cursor.getString(0));
+                item.noteBookId = Integer.parseInt(cursor.getString(1));
+                item.parentItemId = Integer.parseInt(cursor.getString(2));
+                item.itemNumber = Integer.parseInt(cursor.getString(3));
+                item.itemSeqNo = Integer.parseInt(cursor.getString(4));
+                item.itemSummary = cursor.getString(5);
 
-                cnt++;
+                list.add(item);
             } while(cursor.moveToNext());
         }
         return list;
     }
+
+    public void subListResequence(SQLiteOpenHelper helper, ArrayList<RecordListItem> raa)
+    {
+        int lSeqNo=1;
+        for (int i = 0; i < raa.size(); i++)
+        {
+            RecordListItem ra = raa.get(i);
+            ra.itemSeqNo=lSeqNo;
+            updateItem(helper, ra);
+            lSeqNo++;
+        }
+    }
+
 
     public String[] getParents(SQLiteOpenHelper helper, int parentItemId)
     {
         ArrayList<String> localParents = new ArrayList<String>();
         RecordListItem rec;
 
+        if(parentItemId==0)
+        {
+            String[] list = new String[0];
+            return (list);
+        }
+
         rec = getItem(helper, parentItemId);
+        if(rec==null)
+        {
+            String[] list = new String[0];
+            return (list);
+        }
 
         int lParentItemId = rec.parentItemId;
         while(lParentItemId>0)
@@ -213,8 +233,9 @@ public class TableListItem extends TableBase
             localParents.add(rec.itemSummary);
             lParentItemId = rec.parentItemId;
         }
-
         String[] list = new String[localParents.size()];
+
+
         String lPrefix="    ";
         int j=0;
         for(int i=localParents.size()-1;i>=0; i--)

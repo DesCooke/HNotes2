@@ -13,6 +13,8 @@ import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
+import android.support.v7.widget.helper.ItemTouchHelper;
+import com.example.cooked.hnotes2.helper.DragItemTouchHelper;
 
 import com.example.cooked.hnotes2.Database.Database;
 import com.example.cooked.hnotes2.Database.RecordListItem;
@@ -20,6 +22,7 @@ import com.example.cooked.hnotes2.Database.RecordNoteBook;
 import com.example.cooked.hnotes2.Database.RecordPage;
 import com.example.cooked.hnotes2.UI.ListItemAdapter;
 
+import java.util.ArrayList;
 import java.util.List;
 
 public class ListActivity extends AppCompatActivity
@@ -29,10 +32,11 @@ public class ListActivity extends AppCompatActivity
     FloatingActionButton mFabAdd;
     public int noteBookId;
     public RecordNoteBook recordNoteBook;
-    public RecordListItem mDataset[];
+    public ArrayList<RecordListItem> mDataset;
     public RecyclerView mItemList;
     public RecyclerView.LayoutManager mLayoutManager;
     public ListItemAdapter mListItemAdapter;
+    private ItemTouchHelper mItemTouchHelper;
 
     protected void refreshTitle()
     {
@@ -99,6 +103,17 @@ public class ListActivity extends AppCompatActivity
                 startActivityForResult(intent, getResources().getInteger(R.integer.edit_list_item_response));
             }
         });
+        mListItemAdapter.setDragListener(new ListItemAdapter.OnStartDragListener() {
+            @Override
+            public void onStartDrag(RecyclerView.ViewHolder viewHolder) {
+                mItemTouchHelper.startDrag(viewHolder);
+            }
+        });
+
+        ItemTouchHelper.Callback callback = new DragItemTouchHelper(mListItemAdapter);
+        mItemTouchHelper = new ItemTouchHelper(callback);
+        mItemTouchHelper.attachToRecyclerView(mItemList);
+
     }
 
     public void onActivityResult(int requestCode, int resultCode, Intent data)
@@ -109,13 +124,12 @@ public class ListActivity extends AppCompatActivity
             if(resultCode == RESULT_OK) {
                 int itemId = data.getIntExtra("ITEMID",0);
                 RecordListItem rec=Database.MyDatabase().getListItem(itemId);
-                RecordListItem[] list;
-                list = new RecordListItem[mDataset.length+1];
-                for(int i=0;i<mDataset.length;i++)
+                ArrayList<RecordListItem> list = new ArrayList<RecordListItem>();
+                for(int i=0;i<mDataset.size();i++)
                 {
-                    list[i]=mDataset[i];
+                    list.add(mDataset.get(i));
                 }
-                list[mDataset.length]=rec;
+                list.add(rec);
                 mDataset = list;
 
                 CreateAndAttachAdapter();
@@ -131,16 +145,15 @@ public class ListActivity extends AppCompatActivity
                 if(action.compareTo("edit")==0)
                 {
                     RecordListItem rec=Database.MyDatabase().getListItem(itemId);
-                    RecordListItem[] list;
-                    list = new RecordListItem[mDataset.length];
-                    for (int i = 0; i < mDataset.length; i++)
+                    ArrayList<RecordListItem> list = new ArrayList<RecordListItem>();
+                    for (int i = 0; i < mDataset.size(); i++)
                     {
-                        if (mDataset[i].itemId == itemId)
+                        if (mDataset.get(i).itemId == itemId)
                         {
-                            list[i] = rec;
+                            list.add(rec);
                         } else
                         {
-                            list[i] = mDataset[i];
+                            list.add(mDataset.get(i));
                         }
                     }
                     mDataset = list;
@@ -150,14 +163,13 @@ public class ListActivity extends AppCompatActivity
                 }
                 if(action.compareTo("delete")==0)
                 {
-                    RecordListItem[] list;
-                    list = new RecordListItem[mDataset.length-1];
+                    ArrayList<RecordListItem> list = new ArrayList<RecordListItem>();
                     int j=0;
-                    for (int i = 0; i < mDataset.length; i++)
+                    for (int i = 0; i < mDataset.size(); i++)
                     {
-                        if (mDataset[i].itemId != itemId)
+                        if (mDataset.get(i).itemId != itemId)
                         {
-                            list[j] = mDataset[i];
+                            list.add(mDataset.get(i));
                             j++;
                         }
                     }
