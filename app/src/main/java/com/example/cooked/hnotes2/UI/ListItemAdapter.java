@@ -1,25 +1,49 @@
 package com.example.cooked.hnotes2.UI;
 
+import android.support.v4.view.MotionEventCompat;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.LinearLayout;
 import android.widget.TextView;
+import android.content.Context;
+import android.view.MotionEvent;
+import android.widget.ImageView;
+import android.widget.LinearLayout;
 
+import com.example.cooked.hnotes2.Database.Database;
+import com.example.cooked.hnotes2.helper.DragItemTouchHelper;  // replace with your own package path
 import com.example.cooked.hnotes2.Database.RecordListItem;
 import com.example.cooked.hnotes2.R;
 
-public class ListItemAdapter extends RecyclerView.Adapter<ListItemAdapter.ViewHolder>
-{
-    private RecordListItem[] mDataset;
-    public OnItemClickListener mOnItemClickListener;
+import java.util.ArrayList;
+import java.util.Collections;
 
+public class ListItemAdapter
+        extends RecyclerView.Adapter<ListItemAdapter.ViewHolder>
+        implements DragItemTouchHelper.MoveHelperAdapter
+{
+    private ArrayList<RecordListItem> mDataset;
+    public OnItemClickListener mOnItemClickListener;
+    public OnStartDragListener mDragStartListener = null;
+
+    public interface OnStartDragListener {
+        void onStartDrag(RecyclerView.ViewHolder viewHolder);
+    }
     public interface OnItemClickListener
     {
         void onItemClick(View view, RecordListItem obj);
     }
 
+    public void setDragListener(OnStartDragListener dragStartListener) {
+        try
+        {
+            this.mDragStartListener = dragStartListener;
+        } catch (Exception e)
+        {
+        }
+    }
     public void setOnItemClickListener(final ListItemAdapter.OnItemClickListener mItemClickListener)
     {
         this.mOnItemClickListener = mItemClickListener;
@@ -29,22 +53,35 @@ public class ListItemAdapter extends RecyclerView.Adapter<ListItemAdapter.ViewHo
     // Provide a reference to the views for each data item
     // Complex data items may need more than one view per item, and
     // you provide access to all the views for a data item in a view holder
-    public static class ViewHolder extends RecyclerView.ViewHolder
+    public static class ViewHolder
+            extends RecyclerView.ViewHolder
+            implements DragItemTouchHelper.TouchViewHolder
     {
         // each data item is just a string in this case
         public TextView mItemSummary;
         public LinearLayout mCellFull;
+        public ImageView mAcMove;
 
+        @Override
+        public void onItemSelected()
+        {
+        }
+
+        @Override
+        public void onItemClear()
+        {
+        }
         public ViewHolder(View v)
         {
             super(v);
             mItemSummary = (TextView) v.findViewById(R.id.cellItemSummary);
             mCellFull = v.findViewById(R.id.cell_full);
+            mAcMove = v.findViewById(R.id.ac_move);
         }
     }
 
     // Provide a suitable constructor (depends on the kind of dataset)
-    public ListItemAdapter(RecordListItem[] myDataset)
+    public ListItemAdapter(ArrayList<RecordListItem> myDataset)
     {
         mDataset = myDataset;
     }
@@ -63,11 +100,11 @@ public class ListItemAdapter extends RecyclerView.Adapter<ListItemAdapter.ViewHo
 
     // Replace the contents of a view (invoked by the layout manager)
     @Override
-    public void onBindViewHolder(ViewHolder holder, final int position)
+    public void onBindViewHolder(final ViewHolder holder, final int position)
     {
         // - get element from your dataset at this position
         // - replace the contents of the view with that element
-        holder.mItemSummary.setText(mDataset[position].itemSummary);
+        holder.mItemSummary.setText(mDataset.get(position).itemSummary);
 
         holder.mCellFull.setOnClickListener(new View.OnClickListener()
         {
@@ -76,8 +113,21 @@ public class ListItemAdapter extends RecyclerView.Adapter<ListItemAdapter.ViewHo
             {
                 if (mOnItemClickListener != null)
                 {
-                    mOnItemClickListener.onItemClick(view, mDataset[position]);
+                    mOnItemClickListener.onItemClick(view, mDataset.get(position));
                 }
+            }
+        });
+
+        holder.mAcMove.setOnTouchListener(new View.OnTouchListener()
+        {
+            @Override
+            public boolean onTouch(View v, MotionEvent event)
+            {
+                if (MotionEventCompat.getActionMasked(event) == MotionEvent.ACTION_DOWN && mDragStartListener != null)
+                {
+                    mDragStartListener.onStartDrag(holder);
+                }
+                return false;
             }
         });
     }
@@ -86,6 +136,21 @@ public class ListItemAdapter extends RecyclerView.Adapter<ListItemAdapter.ViewHo
     @Override
     public int getItemCount()
     {
-        return mDataset.length;
+        return mDataset.size();
     }
+
+    @Override
+    public void onItemMove(int fromPosition, int toPosition)
+    {
+        try
+        {
+            Collections.swap(mDataset, fromPosition, toPosition);
+            notifyItemMoved(fromPosition, toPosition);
+            Database.MyDatabase().subListResequence(mDataset);
+        } catch (Exception e)
+        {
+        }
+
+    }
+
 }

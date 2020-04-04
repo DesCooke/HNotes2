@@ -7,6 +7,8 @@ import android.database.sqlite.SQLiteOpenHelper;
 import com.example.cooked.hnotes2.MainActivity;
 import com.example.cooked.hnotes2.R;
 
+import java.util.ArrayList;
+
 // derived from SQLiteOpenHelper because it give lots of features like - upgrade/downgrade
 // automatically handles the creation and recreation of the database
 public class Database extends SQLiteOpenHelper
@@ -186,9 +188,14 @@ public class Database extends SQLiteOpenHelper
         return(tableListItem.getParents(this, id));
     }
 
-    public RecordListItem[] getListItems(int noteBookId, int parentItemId)
+    public ArrayList<RecordListItem> getListItems(int noteBookId, int parentItemId)
     {
         return(tableListItem.getList(this, noteBookId, parentItemId));
+    }
+
+    public void subListResequence(ArrayList<RecordListItem> raa)
+    {
+        tableListItem.subListResequence(this, raa);
     }
 
     public void updateListItem(RecordListItem item)
